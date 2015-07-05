@@ -1,0 +1,117 @@
+@import "base.less";
+
+/* 链接样式 */
+.aColor(@linkColor,@background) { 
+     .color(@linkColor);
+    .backgroundColor(@background);
+     text-decoration: none; 
+     &:hover {
+          .lightColor(@linkColor);
+         .backgroundColor(@background);
+          text-decoration: none; 
+     } 
+     &:link{
+         .backgroundColor(@background);
+          .color(@linkColor);
+          text-decoration: none; 
+     }
+ }
+
+
+
+
+/* ff滚动条颜色 */
+// webkit滚动条样式
+::-webkit-scrollbar/*整体部分*/
+{
+    width: 10px;
+    height:10px;
+}
+
+::-webkit-scrollbar-track/*滑动轨道*/
+{
+    .boxShadow(inset,0,0,5px,@gray-backcolor);
+    .borderRadius(0px);
+    .backgroundColor(@gray-backcolor);
+}
+
+::-webkit-scrollbar-thumb/*滑块*/
+{
+    .borderRadius();
+    .boxShadow(inset,0,0,5px,@black-backcolor);
+    .backgroundColor(@black-backcolor);
+}
+
+::-webkit-scrollbar-thumb:hover/*滑块效果*/
+{
+    .borderRadius();
+    .boxShadow(inset,0,0,5px,@black-backcolor);
+    .lightBackColor(@black-backcolor);
+}
+
+// ie滚动条样式
+body{ 
+    scrollbar-base-color: @gray-backcolor;   
+    scrollbar-3dlight-color: @gray-backcolor;   
+    scrollbar-highlight-color: @gray-backcolor;   
+    scrollbar-track-color: @black-backcolor;   
+    scrollbar-arrow-color:@black-backcolor;   
+    scrollbar-shadow-color: @gray-backcolor;   
+    scrollbar-dark-shadow-color: @gray-backcolor; 
+}
+// ff滚动条样式  
+@namespace url(http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul);
+scrollbar {
+  -moz-appearance: none !important;
+  border: none !important;
+  background:  @gray-backcolor !important;
+}
+scrollbar[orient="vertical"] { width: 10px !important; }
+scrollbar[orient="horizontal"] { height: 10px !important; }
+scrollbar thumb {
+  -moz-appearance: none !important;
+  border: none !important;
+  background: @gray-backcolor !important;
+  border-radius: 3px !important;
+}
+scrollbar thumb:hover { background-color: @black-backcolor !important; }
+scrollbar thumb:active { background-color: @black-backcolor !important; }
+scrollbar scrollbarbutton, scrollbar gripper { display: none !important; }
+
+.jumbotron{
+        height:730px;
+        .margin(0px,-15px,0px,-15px);
+        .backgroundColor(transparent);
+        border-bottom: 1px solid #ddd;
+        pading:120px 60px;
+}
+
+.firstJumbotron{
+    height:640px;
+    .backgroundColor(@black-backcolor*1.1);
+    .margin(-20px,-15px,0px,-15px);
+    .color(@white-color);
+}
+.whiteJumbotron{
+    .backgroundColor(#fff);
+}
+.blueJumbotron{
+   .color(@white-color);
+   .backgroundColor(@black-backcolor);
+}
+.grayJumbotron{
+     .darkBackColor(#fff);
+}
+
+.footer{
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.navbar-nav > li > a {
+    font-size: 16px;
+}
+.book-icon{
+    font-size: 60px;
+    margin: 10px auto 20px auto;
+}
