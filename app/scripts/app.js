@@ -37,6 +37,16 @@ var angularApp = angular
         controller: 'BookCtrl',
         controllerAs: 'book'
       })
+      .when('/code', {
+        templateUrl: 'views/code.html',
+        controller: 'CodeCtrl',
+        controllerAs: 'code'
+      })
+      .when('/cicd', {
+        templateUrl: 'views/cicd.html',
+        controller: 'CicdCtrl',
+        controllerAs: 'cicd'
+      })
       .when('/about', {
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl',
@@ -52,12 +62,16 @@ angularApp.factory("config",function(){
         envirement:"dev",
         dev:{
             hrefs:{
-                book:"http://localhost:4000"
+                book:"http://localhost:4000",
+                code:"http://localhost:10080",
+                test:"http://localhost:10081"
             }
         },
         pro:{
             hrefs:{
-                book:"http://docs.dockerdocs.cn"
+                book:"http://docs.dockerdocs.cn",
+                code:"http://gitlab.dockerdocs.cn",
+                test:"http://gitlabci.dockerdocs.cn"
             }
         }
     }
@@ -72,6 +86,8 @@ angularApp.config(function($sceDelegateProvider) {
     'http://*.dockerdocs.cn/**',
     'http://*.docker.io/**',
     'http://*.docker.com/**',
-    'http://localhost:4000/**'
+    'http://localhost:4000/**',   // gitbook
+    'http://localhost:10080/**',  // gitlab
+    'http://localhost:10081/**',  // gitlab ci
   ]);
 });

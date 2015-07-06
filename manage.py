@@ -26,17 +26,6 @@ class Application(tornado.web.Application):
         )
         tornado.web.Application.__init__(self, handlers, **settings)
 
-class BaseHandler(tornado.web.RequestHandler):
-    def __init__( self, *args, **kwargs ):
-        tornado.web.RequestHandler.__init__( self, *args, **kwargs )
-
-    # 覆写 static_url 方法，让其解析到文件服务器的地址
-    def static_url(self, path, include_host=None, **kwargs):
-        self.require_setting("static_path", "static_url")
-
-        base = "http://forecastexam-public.stor.sinaapp.com/static/"
-
-        return base + path
 
 class HomeHandler(tornado.web.RequestHandler):
     def get(self):
