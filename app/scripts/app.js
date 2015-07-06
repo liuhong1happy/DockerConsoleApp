@@ -42,6 +42,11 @@ var angularApp = angular
         controller: 'CodeCtrl',
         controllerAs: 'code'
       })
+      .when('/cicd', {
+        templateUrl: 'views/cicd.html',
+        controller: 'CicdCtrl',
+        controllerAs: 'cicd'
+      })
       .when('/about', {
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl',
