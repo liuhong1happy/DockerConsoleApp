@@ -37,6 +37,11 @@ var angularApp = angular
         controller: 'BookCtrl',
         controllerAs: 'book'
       })
+      .when('/code', {
+        templateUrl: 'views/code.html',
+        controller: 'CodeCtrl',
+        controllerAs: 'code'
+      })
       .when('/about', {
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl',
@@ -72,6 +77,8 @@ angularApp.config(function($sceDelegateProvider) {
     'http://*.dockerdocs.cn/**',
     'http://*.docker.io/**',
     'http://*.docker.com/**',
-    'http://localhost:4000/**'
+    'http://localhost:4000/**',   // gitbook
+    'http://localhost:10080/**',  // gitlab
+    'http://localhost:10081/**',  // gitlab ci
   ]);
 });
