@@ -57,12 +57,16 @@ angularApp.factory("config",function(){
         envirement:"dev",
         dev:{
             hrefs:{
-                book:"http://localhost:4000"
+                book:"http://localhost:4000",
+                code:"http://localhost:10080",
+                test:"http://localhost:10081"
             }
         },
         pro:{
             hrefs:{
-                book:"http://docs.dockerdocs.cn"
+                book:"http://docs.dockerdocs.cn",
+                code:"http://gitlab.dockerdocs.cn",
+                test:"http://gitlabci.dockerdocs.cn"
             }
         }
     }
