@@ -20,8 +20,8 @@
 - 后端开发框架 tornado
 - 前端开发框架 angularjs
 - 前端脚手架工具 yo
-- 自动化构建 bower grunt
-- 自动化测试工具 karma
+- 前端自动化构建 bower grunt
+- 前端自动化测试工具 karma
 - docker应用程序接口 pydocker
 - session存储 redis
 - 服务发现 etcd
