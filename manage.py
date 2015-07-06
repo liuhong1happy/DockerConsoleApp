@@ -8,6 +8,9 @@ from tornado import gen
 import tornado.httpserver
 import os.path
 
+from util.db import init_db
+
+
 define("port", default=8888, help="run on the given port", type=int)
 
 class Application(tornado.web.Application):
@@ -25,7 +28,11 @@ class Application(tornado.web.Application):
             debug=True,
         )
         tornado.web.Application.__init__(self, handlers, **settings)
+    
+        self.init_service()
 
+    def init_service(self):
+        init_db()
 
 class HomeHandler(tornado.web.RequestHandler):
     def get(self):
