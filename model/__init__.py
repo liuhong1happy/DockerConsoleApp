@@ -20,7 +20,7 @@ class BaseModel():
         self.db_conn  = self.db_client.connection(collectionname=self.table, dbname=self.db_client)
         
         
-    def get_list(spec=None,fileds=None,sorts=None,skip=0,limit=20,callback):
+    def get_list(spec,fileds=None,sorts=None,skip=0,limit=20,callback):
         if(spec==None or isinstance(spec,dict)):
             spec = {}
         if(fields==None or isinstance(fields,dict)):
@@ -37,7 +37,7 @@ class BaseModel():
         )
         callback(result_list)
     
-    def get_one(spec_or_id=None,fields=None,callback):
+    def get_one(spec_or_id,fields=None,callback):
         if(spec_or_id==None):
             callback(None)
         if(fields==None or isinstance(fields,dict)):
