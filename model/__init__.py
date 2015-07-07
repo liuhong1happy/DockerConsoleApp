@@ -22,7 +22,7 @@ class BaseModel():
         self.db_conn  = self.db_client.connection(collectionname=self.table, dbname=self.db_client)
         
         
-    def get_list(spec,fileds=None,sorts=None,skip=0,limit=20,callback=None):
+    def get_list(self,spec,fileds=None,sorts=None,skip=0,limit=20,callback=None):
         if(spec==None or not isinstance(spec,dict)):
             spec = {"del_flag":False}
         else:
@@ -41,7 +41,7 @@ class BaseModel():
         )
         callback(result_list)
     
-    def get_one(spec_or_id,fields=None,callback=None):
+    def get_one(self,spec_or_id,fields=None,callback=None):
         if(spec_or_id==None):
             callback(None)
         if(isinstance(spec_or_id,dict):
