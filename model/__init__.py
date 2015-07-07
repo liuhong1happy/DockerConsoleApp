@@ -94,5 +94,6 @@ class BaseModel():
         else:
             callback(None)
             
-        
+        result,error = yield tornado.gen.Task(self.db_conn.update,spec,document,upsert=upsert,manipulate=manipulate, safe=safe, multi=multi,**kwargs)
+        callback(result)
         
