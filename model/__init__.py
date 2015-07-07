@@ -16,7 +16,7 @@ class BaseModel():
         if not hasattr(self,"table"):
             self.table = self.class_name
         if not hasattr(self,"key"):
-            self.key = self.class_name+"_id"
+            self.key = "_id"
         
 
         self.db_conn  = self.db_client.connection(collectionname=self.table, dbname=self.db_client)
