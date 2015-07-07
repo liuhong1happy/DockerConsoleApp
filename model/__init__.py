@@ -37,14 +37,21 @@ class BaseModel():
         )
         callback(result_list)
     
-    def get_one(spec_or_id,fields,callback):
+    def get_one(spec_or_id=None,fields=None,callback):
+        if(spec_or_id==None):
+            callback(None)
         if(fields==None or isinstance(fields,dict)):
             if not hasattr(self,"fields"):
                 fields = self.fields
             else:
                 fields = {"_id":True}
-        result,error = yield tornado.gen.Task( self.db_conn.find_one,spec,fields = fields)
+        result,error = yield tornado.gen.Task(self.db_conn.find_one,spec_or_id,fields = fields)
         callback(result)
-         
+    
+    def insert(self,doc_or_docs,manipulate=True, safe=True, check_keys=True, callback=None,**kwargs):
+        if(doc_or_docs==None):
+            callback(None)
+        result,error = yield tornado.gen.Task(self.db_conn.insert,doc_or_docs,manipulate=manipulate, safe=safe, check_keys=check_keys,**kwargs)
+        callback(result)
     
     
