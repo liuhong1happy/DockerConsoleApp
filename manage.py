@@ -7,11 +7,11 @@ from tornado.options import define, options
 from tornado import gen
 import tornado.httpserver
 import os.path
-
+import settings
 from util.db import init_db
+from util.discover import init_etcd
 
-
-define("port", default=8888, help="run on the given port", type=int)
+define("port", default=settings.TORNADO_PORT, help="run on the given port", type=int)
 
 class Application(tornado.web.Application):
     def __init__(self):
@@ -33,6 +33,7 @@ class Application(tornado.web.Application):
 
     def init_service(self):
         init_db()
+        init_etcd()
 
 class HomeHandler(tornado.web.RequestHandler):
     def get(self):
