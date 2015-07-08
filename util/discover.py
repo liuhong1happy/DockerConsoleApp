@@ -3,7 +3,7 @@ import etcd
 from tornado.options import define, options
 import settings
 
-define("etcd_client", default=None, help="etcd client", type=object)
+
 
 def init_etcd():
     etcd_client = None

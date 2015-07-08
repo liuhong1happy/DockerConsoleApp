@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 import tornado.ioloop
 import tornado.web
 from tornado.options import define, options
@@ -10,13 +9,19 @@ import os.path
 import settings
 from util.db import init_db
 from util.discover import init_etcd
+from util.dockerclient import init_docker
+
 
 define("port", default=settings.TORNADO_PORT, help="run on the given port", type=int)
 
 class Application(tornado.web.Application):
     def __init__(self):
+        self.init_service()
+        
+        from views.service import ServicesHandler
         handlers = [
-            (r"/", HomeHandler)
+            (r"/", HomeHandler),
+            (r"/api/services",ServicesHandler)
         ]
         settings = dict(
             blog_title=u"Docker中文翻译社区",
@@ -29,11 +34,10 @@ class Application(tornado.web.Application):
         )
         tornado.web.Application.__init__(self, handlers, **settings)
     
-        self.init_service()
-
     def init_service(self):
         init_db()
         init_etcd()
+        init_docker()
 
 class HomeHandler(tornado.web.RequestHandler):
     def get(self):

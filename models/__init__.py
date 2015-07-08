@@ -1,3 +1,4 @@
+import settings
 from tornado.options import define,options
 import tornado.gen
 import pymongo
@@ -7,7 +8,7 @@ import time
 __all__=["get_list","get_one","update","insert","delete","exsit","count"]
 
 class BaseModel():
-    def __init__():
+    def __init__(self):
         self.db_client = options.db_client;
         self.module = self.__module__
         self.class_name = self.__class__.__name__
@@ -17,9 +18,7 @@ class BaseModel():
             self.table = self.class_name
         if not hasattr(self,"key"):
             self.key = "_id"
-        
-
-        self.db_conn  = self.db_client.connection(collectionname=self.table, dbname=self.db_client)
+        self.db_conn  = self.db_client.connection(collectionname=self.table, dbname=self.db)
         
         
     def get_list(self,spec,fileds=None,sorts=None,skip=0,limit=20,callback=None):
@@ -32,7 +31,7 @@ class BaseModel():
                 fields = self.fields
             else:
                 fields = {"_id":True,"del_flag":False}
-        if(sorts==None or not isinstance(sorts,list):
+        if(sorts==None or not isinstance(sorts,list)):
             sorts = []
             sorts.append(["_id", pymongo.DESCENDING])
         result_list,error = yield tornado.gen.Task( self.db_conn.find,
@@ -44,7 +43,7 @@ class BaseModel():
     def get_one(self,spec_or_id,fields=None,callback=None):
         if(spec_or_id==None):
             callback(None)
-        if(isinstance(spec_or_id,dict):
+        if(isinstance(spec_or_id,dict)):
             spec_or_id["del_flag"] = False 
         
         if(fields==None or not isinstance(fields,dict)):

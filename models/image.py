@@ -1,4 +1,4 @@
-from model import BaseModel
+from models import BaseModel
 
 class ImageModel(BaseModel):
     table = "images",

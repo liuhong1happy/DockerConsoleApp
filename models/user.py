@@ -1,4 +1,4 @@
-from model import BaseModel
+from models import BaseModel
 
 class UserModel(BaseModel):
     table = "users",
