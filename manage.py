@@ -38,6 +38,7 @@ class Application(tornado.web.Application):
         init_db()
         init_etcd()
         init_docker()
+        init_amqp()
 
 class HomeHandler(tornado.web.RequestHandler):
     def get(self):
