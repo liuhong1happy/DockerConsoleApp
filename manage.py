@@ -10,7 +10,7 @@ import settings
 from util.db import init_db
 from util.discover import init_etcd
 from util.dockerclient import init_docker
-
+from util.rabbitmq import init_amqp
 
 define("port", default=settings.TORNADO_PORT, help="run on the given port", type=int)
 
