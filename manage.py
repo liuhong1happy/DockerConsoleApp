@@ -13,6 +13,7 @@ from util.dockerclient import init_docker
 from util.rabbitmq import init_amqp
 
 define("port", default=settings.TORNADO_PORT, help="run on the given port", type=int)
+define("ioloop",default=None,help="global ioloop instance",type=object)
 
 class Application(tornado.web.Application):
     def __init__(self):
@@ -49,7 +50,10 @@ def main():
     tornado.options.parse_command_line()
     http_server = tornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
-    tornado.ioloop.IOLoop.instance().start()
+    
+    ioloop_instance = tornado.ioloop.IOLoop.instance()
+    options.ioloop = ioloop_instance
+    ioloop_instance.start()
 
 if __name__ == "__main__":
     main()
