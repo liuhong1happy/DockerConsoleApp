@@ -39,8 +39,7 @@
 - etcd
 - gitbook
 - gitlab
-- gitlab ci
-- gitlab ci runner
+- rabbitmq
 - register若干
 - discover
 
