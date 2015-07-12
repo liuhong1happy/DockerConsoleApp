@@ -2,7 +2,7 @@ from services.service import ServiceService
 import tornado.web
 import tornado.gen
 import tornado.escape
-
+import json
 class ServiceHandler(tornado.web.RequestHandler):
     @tornado.web.asynchronous
     def get(self):
@@ -57,16 +57,12 @@ class GetServiceLogsHandler(tornado.web.RequestHandler):
             json = tornado.escape.json_decode({"status":"success","data":service})
         self.write(json)
         self.finish()
-
-class GetRunningServiceLogsHandler(tornado.web.RequestHandler):
-    def get(self):
-        
-        
     
 class ServicesHandler(tornado.web.RequestHandler):
     s_service = ServiceService()
     
     @tornado.web.asynchronous
+    @tornado.gen.engine
     def get(self):
         spec_type = self.get_argument("spec_type","name")
         spec_text =  self.get_argument("spec_text","")
@@ -78,15 +74,17 @@ class ServicesHandler(tornado.web.RequestHandler):
             "name":True,
             "user":True,
             "image":True,
-            "ports":True,
-            "envirements":True,
-            "logo":True
+            "code":True,
+            "status":True,
+            "logs":True,
+            "update_time":True
         }
-        services = tornado.gen.Task(s_service.get_list,spec,fields=fields,page_index=page_index,page_size=page_size)
-        json = {}
+
+        services =yield tornado.gen.Task(self.s_service.get_list,spec,fields=fields,page_index=page_index,page_size=page_size)
+        _json = ""
         if not services:
-            json = tornado.escape.json_decode({"status":"error","error_code":404})
+            _json =json.dumps({"status":"error","error_code":404})
         else:
-            json = tornado.escape.json_decode({"status":"success","data":services})
-        self.write(json)
+            _json = json.dumps({"status":"success","data":services})
+        self.write(_json)
         self.finish()

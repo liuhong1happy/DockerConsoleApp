@@ -1,1 +1,46 @@
-<iframe src="[[gitlabci]]" frameborder="0" width="[[gitlabci_width]]" height="[[gitlabci_height]]" style="margin:-20px -15px -5px -15px;padding:0px;" scrolling="no"></iframe>
+<div class="row" style="margin:20px 120px;">
+    <h2>代码构建</h2>
+    <p>我们需要自动化去部署代码，必然会面临代码构建成容器镜像，本步骤即为构建镜像</p>
+    <a class="btn btn-primary" ng-click="showScope='form'">创建任务</a>
+    <hr />
+</div>
+<div class="row" ng-Show="showScope=='list'"   style="margin:20px 120px;">
+    <table class="table">
+        <thead>
+            <tr>
+                <td>任务名称</td>
+                <td>代码源</td>
+                <td>构建状态</td>
+                <td>镜像名称</td>
+                <td>更新时间</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="service in services">
+                <td>[[service.name]]</td>
+                <td>[[service.code]]</td>
+                <td>[[service.status]]</td>
+                <td>[[service.image_name]]</td>
+                <td>[[service.update_time]]</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="row" ng-Show="showScope=='form'"   style="margin:20px 120px;">
+<form>
+    <div class="form-group">
+        <label class="col-xs-2">任务名称</label>
+        <div class="col-xs-10"> 
+            <input type="text" class="form-control"  ng-model="service_name"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label  class="col-xs-2">代码位置</label>
+        <div  class="col-xs-10">
+            <input type="text" class="form-control" ng-model="git_path"/>
+        </div>
+    </div>
+</form>
+</div>
+
+

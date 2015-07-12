@@ -1,6 +1,7 @@
 import settings
 from tornado.options import define,options
 import tornado.gen
+import tornado.web
 import pymongo
 import logging
 import time
@@ -19,9 +20,10 @@ class BaseModel():
         if not hasattr(self,"key"):
             self.key = "_id"
         self.db_conn  = self.db_client.connection(collectionname=self.table, dbname=self.db)
-        
-        
-    def get_list(self,spec,fileds=None,sorts=None,skip=0,limit=20,callback=None):
+
+
+    @tornado.gen.engine
+    def get_list(self,spec,fields=None,sorts=None,skip=0,limit=20,callback=None):
         if(spec==None or not isinstance(spec,dict)):
             spec = {"del_flag":False}
         else:
@@ -34,11 +36,8 @@ class BaseModel():
         if(sorts==None or not isinstance(sorts,list)):
             sorts = []
             sorts.append(["_id", pymongo.DESCENDING])
-        result_list,error = yield tornado.gen.Task( self.db_conn.find,
-            spec = spec,fields = fields,
-            sort = sorts,limit = limit,skip = skip
-        )
-        callback(result_list)
+        result = yield tornado.gen.Task(self.db_conn.find,spec=spec,fields = fields,sort = sorts,limit = limit,skip = skip)
+        callback(result)
     
     def get_one(self,spec_or_id,fields=None,callback=None):
         if(spec_or_id==None):

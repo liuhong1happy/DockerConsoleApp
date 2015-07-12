@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from tornado.options import define, options
 import asyncmongo
 # 基本链接信息

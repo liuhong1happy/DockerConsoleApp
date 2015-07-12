@@ -7,8 +7,6 @@ class ServiceModel(BaseModel):
     fields={
         "name":True,
         "user":True,
-        "image":True,
-        "ports":True,
-        "envirements":True,
-        "logo":True
+        "code":True,
+        "logs":True
     }
