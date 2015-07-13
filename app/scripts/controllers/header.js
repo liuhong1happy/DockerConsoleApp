@@ -3,5 +3,4 @@ angularApp.controller("navHeader",["$scope","config","$location",function($scope
     var env = config.envirement;
     $scope.book = config[env].hrefs.book;
     $scope.activeNav = url;
-    $scope.$apply();
 }]);

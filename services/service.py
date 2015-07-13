@@ -28,6 +28,7 @@ class ServiceService():
             
     @tornado.gen.engine
     def get_list(self,spec,fields=None,sorts=None,page_index=0,page_size=20,callback=None):
+
         result = yield tornado.gen.Task(self.m_service.get_list,spec,fields=fields,sorts=sorts,skip=page_size*page_index,limit=page_size)
         if result==None or not isinstance(result,list):
             callback(None)

@@ -66,8 +66,8 @@ class ServicesHandler(tornado.web.RequestHandler):
     def get(self):
         spec_type = self.get_argument("spec_type","name")
         spec_text =  self.get_argument("spec_text","")
-        page_index = self.get_argument("page_index",0)
-        page_size = self.get_argument("page_size",20)
+        page_index =int(self.get_argument("page_index",0))
+        page_size =int(self.get_argument("page_size",20))
         spec ={}
         spec[spec_type]=spec_text
         fields={

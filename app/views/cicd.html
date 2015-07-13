@@ -1,7 +1,7 @@
 <div class="row" style="margin:20px 120px;">
     <h2>代码构建</h2>
     <p>我们需要自动化去部署代码，必然会面临代码构建成容器镜像，本步骤即为构建镜像</p>
-    <a class="btn btn-primary" ng-click="showScope='form'">创建任务</a>
+    <a class="btn btn-success" ng-click="showScope='form'">创建任务</a>
     <hr />
 </div>
 <div class="row" ng-Show="showScope=='list'"   style="margin:20px 120px;">
@@ -27,18 +27,23 @@
     </table>
 </div>
 <div class="row" ng-Show="showScope=='form'"   style="margin:20px 120px;">
-<form>
-    <div class="form-group">
+<form role="form" name="service_form" class="form-horizontal" ng-submit="submitForm(service_form.$valid)"  novalidate> 
+    <div class="form-group has-feedback">
         <label class="col-xs-2">任务名称</label>
         <div class="col-xs-10"> 
-            <input type="text" class="form-control"  ng-model="service_name"/>
+            <input type="text" class="form-control"  name="service_name" ng-model="service_name" required  ng-maxlength="20"/>
+            <span class="glyphicon glyphicon-ok form-control-feedback" ng-show="service_form.service_name.$dirty && service_form.service_name.$valid"></span>
         </div>
     </div>
-    <div class="form-group">
+    <div class="form-group has-feedback">
         <label  class="col-xs-2">代码位置</label>
         <div  class="col-xs-10">
-            <input type="text" class="form-control" ng-model="git_path"/>
+            <input type="text" class="form-control"  name="git_path"  ng-model="git_path" required  ng-maxlength="200"/>
+            <span class="glyphicon glyphicon-ok form-control-feedback" ng-show="service_form.git_path.$dirty && service_form.git_path.$valid"></span>
         </div>
+    </div>
+    <div class="form-group has-feedback">
+        <input class="btn btn-success" type="submit" ng-disabled="service_form.$invalid" value="提交"/>
     </div>
 </form>
 </div>
