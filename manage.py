@@ -19,10 +19,11 @@ class Application(tornado.web.Application):
     def __init__(self):
         self.init_service()
         
-        from views.service import ServicesHandler
+        from views.service import ServicesHandler,ServiceHandler
         handlers = [
             (r"/", HomeHandler),
-            (r"/api/services",ServicesHandler)
+            (r"/api/services",ServicesHandler),
+            (r"/api/service",ServiceHandler)
         ]
         settings = dict(
             blog_title=u"Docker中文翻译社区",
