@@ -24,11 +24,14 @@ class ServiceHandler(tornado.web.RequestHandler):
         self.write(json)
         self.finish()
     
+    @tornado.web.asynchronous
     def post(self):
         git_path = self.get_argument("git_path",None)
         name = self.get_argument("service_name",None)
         user_name = self.get_argument("user_name","admin")
+        # 数据库操作
         
+        # 加入队列
         conn = options.mq_connection
         ch = conn.chanel()
         massage = Message({
