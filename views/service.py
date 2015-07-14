@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from services.service import ServiceService
 import tornado.web
 import tornado.gen
