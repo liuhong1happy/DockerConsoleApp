@@ -39,6 +39,7 @@ class BaseModel():
         result = yield tornado.gen.Task(self.db_conn.find,spec=spec,fields = fields,sort = sorts,limit = limit,skip = skip)
         callback(result)
     
+    @tornado.gen.engine
     def get_one(self,spec_or_id,fields=None,callback=None):
         if(spec_or_id==None):
             callback(None)
@@ -53,6 +54,7 @@ class BaseModel():
         result,error = yield tornado.gen.Task(self.db_conn.find_one,spec_or_id,fields = fields)
         callback(result)
     
+    @tornado.gen.engine
     def insert(self,doc_or_docs,manipulate=True, safe=True, check_keys=True, callback=None,**kwargs):
         create_time = int(time.time())
         if(doc_or_docs==None):
@@ -70,6 +72,7 @@ class BaseModel():
         result,error = yield tornado.gen.Task(self.db_conn.insert,doc_or_docs,manipulate=manipulate, safe=safe, check_keys=check_keys,**kwargs)
         callback(result)
     
+    @tornado.gen.engine
     def update(self, spec, document, upsert=False, manipulate=False,
                safe=True, multi=True, callback=None, **kwargs):
         update_time = int(time.time())
