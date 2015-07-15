@@ -6,6 +6,7 @@ import tornado.gen
 import tornado.escape
 import json
 class ServiceHandler(tornado.web.RequestHandler):
+    s_service = ServiceService()
     @tornado.web.asynchronous
     def get(self):
         service_id = self.get_argument("id")
@@ -17,7 +18,7 @@ class ServiceHandler(tornado.web.RequestHandler):
             "envirements":True,
             "logo":True
         }
-        service = tornado.gen.Task(s_service.get_one,service_id,fields=fields)
+        service = tornado.gen.Task(self.s_service.get_one,service_id,fields=fields)
         
         if not service:
             json = tornado.escape.json_decode({"status":"error","error_code":404})
@@ -32,6 +33,13 @@ class ServiceHandler(tornado.web.RequestHandler):
         name = self.get_argument("service_name",None)
         user_name = self.get_argument("user_name","admin")
         # 数据库操作
+        insertData = {}
+        insertData.code = git_path
+        insertData.name = name
+        insertData.user = user_name
+        insertData.status = 'created'
+        
+        result = yield tornado.gen.Task(self.s_service.insert,insertData)
         
         # 加入队列
         conn = options.mq_connection
@@ -46,6 +54,13 @@ class ServiceHandler(tornado.web.RequestHandler):
         self.ch.queue_declare(queue='create_service',durable=True)
         self.ch.queue_bind(queue='create_service',exchange='create_service',routing_key='create_service')
         ch.publish(msg, exchange='create_service', routing_key='create_service')
+
+        if not result:
+            json = tornado.escape.json_decode({"status":"error","error_code":404})
+        else:
+            json = tornado.escape.json_decode({"status":"success","data":result})
+        self.write(json)
+        self.finish()
     
 class GetServiceLogsHandler(tornado.web.RequestHandler):
     def get(self):
