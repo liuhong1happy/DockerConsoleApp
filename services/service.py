@@ -6,9 +6,10 @@ class ServiceService():
     
     def __init__(self):
         pass
-    
+      
+    @tornado.gen.engine
     def insert_service(self,service,callback=None):
-        model = yield tornado.gen.Task(m_service.insert,service)
+        model = yield tornado.gen.Task(self.m_service.insert,service)
         callback(model)
         
     def exist_user(self,name,user,callback=None):
