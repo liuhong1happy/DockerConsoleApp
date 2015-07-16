@@ -18,12 +18,22 @@ var angularApp = angular
     'ngRoute',
     'ngSanitize',
     'ngTouch'
-  ])
+  ]);
 
  angularApp.config(function($interpolateProvider) {
     $interpolateProvider.startSymbol('[[');
     $interpolateProvider.endSymbol(']]');
   });
+
+ angularApp.config(function($httpProvider) {
+     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+     $httpProvider.defaults.headers.put['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+     $httpProvider.defaults.headers.common["Accept"] = 'application/json, text/plain, * / *';
+     $httpProvider.defaults.headers.common["x-Requested-With"] = "XMLHttpRequest";
+      $httpProvider.defaults.transformRequest = [function(data) {
+        return angular.isObject(data) && String(data) !== '[object File]' ? param(data) : data;
+      }];
+ });
 
   angularApp.config(function ($routeProvider) {
     $routeProvider

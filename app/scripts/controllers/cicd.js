@@ -37,11 +37,11 @@ angularApp.controller('CicdCtrl', ["$scope","config","Services","Service","$wind
                 if (!isValid) {
                     alert('验证失败');
                 }else{
-                    Service.submit(null,{
+                    Service.submit(null, $.param({
                         user_name:"admin",
                         service_name:$scope.service_name,
                         git_path:$scope.git_path
-                    },function(res){
+                    }),function(res){
                         alert('请求成功');
                     },function(e,err){
                         alert('请求失败');
@@ -59,9 +59,10 @@ angularApp.factory('Services',["$resource",function($resource){
         }
     });
 }]);
-
 angularApp.factory('Service',["$resource",function($resource){
-    return $resource('/api/service',{},{
+
+    return $resource('/api/service',{
+    },{
         "submit":{
             method:"POST",
             isArray:false

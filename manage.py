@@ -29,8 +29,8 @@ class Application(tornado.web.Application):
             blog_title=u"Docker中文翻译社区",
             template_path=os.path.join(os.path.dirname(__file__), "dist"),
             static_path=os.path.join(os.path.dirname(__file__), "dist"),
-            xsrf_cookies=True,
-            cookie_secret="__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__",
+            xsrf_cookies=False,
+            cookie_secret="AAAAB3NzaC1yc2EAAAADAQABAAABAQCww",
             login_url="/login",
             debug=True,
         )

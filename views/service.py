@@ -5,9 +5,14 @@ import tornado.web
 import tornado.gen
 import tornado.escape
 import json
+from util.rabbitmq import send_message
+from stormed import Message
+import settings
+
 class ServiceHandler(tornado.web.RequestHandler):
     s_service = ServiceService()
     @tornado.web.asynchronous
+    @tornado.gen.engine
     def get(self):
         service_id = self.get_argument("id")
         fields={
@@ -28,33 +33,32 @@ class ServiceHandler(tornado.web.RequestHandler):
         self.finish()
     
     @tornado.web.asynchronous
+    @tornado.gen.engine
     def post(self):
         git_path = self.get_argument("git_path",None)
         name = self.get_argument("service_name",None)
         user_name = self.get_argument("user_name","admin")
+        
+        print git_path,name,user_name
+        
         # 数据库操作
         insertData = {}
-        insertData.code = git_path
-        insertData.name = name
-        insertData.user = user_name
-        insertData.status = 'created'
+        insertData["code"] = git_path
+        insertData["name"] = name
+        insertData["user"] = user_name
+        insertData["status"] = 'created'
         
-        result = yield tornado.gen.Task(self.s_service.insert,insertData)
+        result= yield tornado.gen.Task(self.s_service.insert_service,insertData)
         
         # 加入队列
-        conn = options.mq_connection
-        ch = conn.chanel()
-        massage = Message({
-            code:git_path,
-            name:name,
-            user:user_name,
-            reply:'service_logs'
+        msg = Message({
+            "code":git_path,
+            "name":name,
+            "user":user_name,
+            "reply_to":'service_logs'
         })
-        ch.exchange_declare(exchange='create_service', type='direct',durable=True)
-        self.ch.queue_declare(queue='create_service',durable=True)
-        self.ch.queue_bind(queue='create_service',exchange='create_service',routing_key='create_service')
-        ch.publish(msg, exchange='create_service', routing_key='create_service')
-
+        send_message(msg,settings.CREATE_SERVICE_EXCHANGE,settings.CREATE_SERVICE_ROUTING)
+        print result
         if not result:
             json = tornado.escape.json_decode({"status":"error","error_code":404})
         else:

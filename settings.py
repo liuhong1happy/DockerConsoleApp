@@ -36,3 +36,16 @@ MQ_USERNAME = 'admin'
 MQ_PASSWORD = 'testpass'
 
 
+# queue declare
+CREATE_SERVICE_EXCHANGE = 'create_service_exchange'
+CREATE_SERVICE_QUEUE = 'create_service_queue'
+CREATE_SERVICE_ROUTING = 'create_service_routing'
+
+
+
+
+
+
+
+
+

@@ -22,7 +22,16 @@ def on_connect():
     
     logging.info("Init amqp success")
     options.mq_connection = conn
+    init_queue()
 
+def init_queue():
+    ch = conn.channel()
+    ch.exchange_declare(exchange= settings.CREATE_SERVICE_EXCHANGE , type='direct',durable=True)
+    ch.queue_declare(queue=settings.CREATE_SERVICE_QUEUE,durable=True)
+    ch.queue_bind(queue=settings.CREATE_SERVICE_QUEUE,
+                  exchange=settings.CREATE_SERVICE_EXCHANGE,
+                  routing_key=settings.CREATE_SERVICE_ROUTING)
+    logging.info("Declare amqp queue and exchange")
 
 def init_amqp():
     def handle_error(conn_error):
@@ -37,4 +46,7 @@ def init_amqp():
 
     conn.connect(on_connect)
 
+def send_message(message,exchange_name,routing_key):
+    ch = conn.channel()
+    ch.publish(msg, exchange=exchange_name, routing_key=routing_key)
   

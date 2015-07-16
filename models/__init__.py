@@ -55,7 +55,7 @@ class BaseModel():
         callback(result)
     
     @tornado.gen.engine
-    def insert(self,doc_or_docs,manipulate=True, safe=True, check_keys=True, callback=None,**kwargs):
+    def insert(self,doc_or_docs,manipulate=True, safe=True, check_keys=True, callback=None):
         create_time = int(time.time())
         if(doc_or_docs==None):
             callback(None)
@@ -69,7 +69,8 @@ class BaseModel():
         else:
             callback(None)
             
-        result,error = yield tornado.gen.Task(self.db_conn.insert,doc_or_docs,manipulate=manipulate, safe=safe, check_keys=check_keys,**kwargs)
+        result,error = yield tornado.gen.Task(self.db_conn.insert,doc_or_docs,manipulate=manipulate, safe=safe, check_keys=check_keys)
+        
         callback(result)
     
     @tornado.gen.engine
