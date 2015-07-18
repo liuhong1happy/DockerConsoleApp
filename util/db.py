@@ -2,15 +2,14 @@ import logging
 import asyncmongo
 from tornado.options import define, options
 import settings
-
+from pymongo import MongoClient
 
 
 def init_db():
     db_client = None;
     try:
-        db_client = asyncmongo.Client(
-            pool_id=settings.MONGO_POOL_ID, host=settings.MONGO_HOST, port=settings.MONGO_PORT, 
-            maxcached=10, maxconnections=50, dbname=settings.MONGO_DB)
+        uri = 'mongodb://'+settings.MONGO_USER+':'+settings.MONGO_PWD+'@'+settings.MONGO_HOST+':'+str(settings.MONGO_PORT)+'/'+settings.MONGO_DB
+        db_client = MongoClient(uri)
         options.db_client = db_client
         logging.info("Init db successed")
     except Exception,e:

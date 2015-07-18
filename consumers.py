@@ -10,20 +10,19 @@ import settings
 from util.db import init_db
 from util.discover import init_etcd
 from util.dockerclient import init_docker
-from util.rabbitmq import init_amqp
+from util.consumer import init_amqp
 
-define("port", default=settings.TORNADO_PORT, help="run on the given port", type=int)
+define("port", default=settings.TORNADO_PORT+1, help="run on the given port", type=int)
 define("ioloop",default=None,help="global ioloop instance",type=object)
 
-def create_service(self,ch, method, properties, body):
-    print " [x] %r:%r" % (method.routing_key, body,)
-
+def create_service(msg):
+    print " [x] %r:%r" % (msg.rx_data,msg.routing_key,msg.body)
 
 
 class Application(tornado.web.Application):
     def __init__(self):
         self.init_service()
-        self.init_consumer()
+
         handlers = []
         settings = dict(
             blog_title=u"Docker中文翻译社区",
@@ -41,14 +40,6 @@ class Application(tornado.web.Application):
         init_etcd()
         init_docker()
         init_amqp()
-    
-    def init_consumer(self):
-        conn = options.mq_connection
-        ch = conn.chanel()
-        channel.consume(create_service,
-                      queue='create_service',
-                      no_ack=True)
-        channel.start_consuming()
 
 def main():
     tornado.options.parse_command_line()

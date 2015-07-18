@@ -9,7 +9,7 @@ class ServiceService():
       
     @tornado.gen.engine
     def insert_service(self,service,callback=None):
-        model = yield tornado.gen.Task(self.m_service.insert,service)
+        model = yield tornado.gen.Task(self.m_service.insert_one,service)
         callback(model)
         
     def exist_user(self,name,user,callback=None):

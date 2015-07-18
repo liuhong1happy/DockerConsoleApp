@@ -15,3 +15,4 @@ def init_docker():
         logging.error("Init docker client failed",e)
 
     return docker_client
+

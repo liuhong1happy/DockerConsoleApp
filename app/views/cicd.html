@@ -20,8 +20,8 @@
                 <td>[[service.name]]</td>
                 <td>[[service.code]]</td>
                 <td>[[service.status]]</td>
-                <td>[[service.image_name]]</td>
-                <td>[[service.update_time]]</td>
+                <td>[[service.image]]</td>
+                <td>[[ (service.update_time?service.update_time:service.create_time)*1000 | date:"yyyy-MM-dd hh:mm:ss"]]</td>
             </tr>
         </tbody>
     </table>

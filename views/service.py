@@ -23,13 +23,14 @@ class ServiceHandler(tornado.web.RequestHandler):
             "envirements":True,
             "logo":True
         }
-        service = tornado.gen.Task(self.s_service.get_one,service_id,fields=fields)
         
+        service = tornado.gen.Task(self.s_service.get_one,service_id,fields=fields)
+        _json = ""
         if not service:
-            json = tornado.escape.json_decode({"status":"error","error_code":404})
+            _json = tornado.escape.json_decode({"status":"error","error_code":404})
         else:
-            json = tornado.escape.json_decode({"status":"success","data":service})
-        self.write(json)
+            _json = tornado.escape.json_decode({"status":"success","data":service})
+        self.write(_json)
         self.finish()
     
     @tornado.web.asynchronous
@@ -38,9 +39,7 @@ class ServiceHandler(tornado.web.RequestHandler):
         git_path = self.get_argument("git_path",None)
         name = self.get_argument("service_name",None)
         user_name = self.get_argument("user_name","admin")
-        
-        print git_path,name,user_name
-        
+                
         # 数据库操作
         insertData = {}
         insertData["code"] = git_path
@@ -48,22 +47,24 @@ class ServiceHandler(tornado.web.RequestHandler):
         insertData["user"] = user_name
         insertData["status"] = 'created'
         
-        result= yield tornado.gen.Task(self.s_service.insert_service,insertData)
-        
+        # result= yield tornado.gen.Task(self.s_service.insert_service,insertData)
+        result = None
         # 加入队列
-        msg = Message({
+        msg = Message( json.dumps({
             "code":git_path,
             "name":name,
             "user":user_name,
             "reply_to":'service_logs'
-        })
+        }) )
+        
         send_message(msg,settings.CREATE_SERVICE_EXCHANGE,settings.CREATE_SERVICE_ROUTING)
-        print result
+        _json = ""
         if not result:
-            json = tornado.escape.json_decode({"status":"error","error_code":404})
+            _json = json.dumps({"status":"error","error_code":404})
         else:
-            json = tornado.escape.json_decode({"status":"success","data":result})
-        self.write(json)
+            insertData["_id"] = str(result)
+            _json = json.dumps({"status":"success","data":insertData})
+        self.write(_json)
         self.finish()
     
 class GetServiceLogsHandler(tornado.web.RequestHandler):
@@ -76,9 +77,9 @@ class GetServiceLogsHandler(tornado.web.RequestHandler):
         service = tornado.gen.Task(s_service.get_one,service_id,fields=fields)
         
         if not service:
-            json = tornado.escape.json_decode({"status":"error","error_code":404})
+            json = json.dumps({"status":"error","error_code":404})
         else:
-            json = tornado.escape.json_decode({"status":"success","data":service})
+            json = json.dumps({"status":"success","data":service})
         self.write(json)
         self.finish()
     
@@ -93,7 +94,7 @@ class ServicesHandler(tornado.web.RequestHandler):
         page_index =int(self.get_argument("page_index",0))
         page_size =int(self.get_argument("page_size",20))
         spec ={}
-        spec[spec_type]=spec_text
+        spec[spec_type]={ '$regex' : spec_text}
         fields={
             "name":True,
             "user":True,
@@ -101,7 +102,8 @@ class ServicesHandler(tornado.web.RequestHandler):
             "code":True,
             "status":True,
             "logs":True,
-            "update_time":True
+            "update_time":True,
+            'create_time':True
         }
 
         services =yield tornado.gen.Task(self.s_service.get_list,spec,fields=fields,page_index=page_index,page_size=page_size)

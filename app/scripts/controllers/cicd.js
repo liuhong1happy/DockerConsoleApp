@@ -23,8 +23,7 @@ angularApp.controller('CicdCtrl', ["$scope","config","Services","Service","$wind
             },function(res){
                 if(res.status=="success"){
                     $scope.services = res.data;
-                    $scope.$apply();
-                    alert('请求成功');
+                    
                 }else{
                     alert('数据为空');
                 }
