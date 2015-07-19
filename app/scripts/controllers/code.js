@@ -7,7 +7,7 @@
  * # CodeCtrl
  * Controller of the angularApp
  */
-angularApp.controller('CodeCtrl', ["$scope","config", function ($scope,config) {
+angularApp.controller('CodeCtrl', ["$scope","config","$timeout","$window", function ($scope,config,$timeout,$window) {
     var env = config.envirement;
     $scope.gitlab = config[env].hrefs.code;   
     

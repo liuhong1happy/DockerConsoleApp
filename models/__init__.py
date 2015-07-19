@@ -20,6 +20,10 @@ class BaseModel():
         if not hasattr(self,"key"):
             self.key = "_id"
         self.db_conn  = self.db_client[self.db][self.table]
+        
+    
+
+        
 
 
     @tornado.gen.engine
@@ -37,29 +41,30 @@ class BaseModel():
             sorts = []
             sorts.append(("_id", pymongo.DESCENDING))
         result = []
-        print spec,fields,sorts,limit,skip
+
         cursor = self.db_conn.find(filter = spec ,projection = fields,sort = sorts,limit = limit,skip = skip)
         
         for doc in cursor:
             doc["_id"] = str(doc["_id"])
             result.append(doc)
-        print result
         callback(result)
     
     @tornado.gen.engine
-    def get_one(self,spec_or_id,fields=None,callback=None):
+    def find_one(self,spec_or_id,fields=None,callback=None):
         if(spec_or_id==None):
             callback(None)
         if(isinstance(spec_or_id,dict)):
-            spec_or_id["del_flag"] = False 
-        
+            spec_or_id["del_flag"] = {'$exists': 'False' }
+            
         if(fields==None or not isinstance(fields,dict)):
             if not hasattr(self,"fields"):
                 fields = self.fields
             else:
-                fields = {"_id":True}
-        result,error = yield tornado.gen.Task(self.db_conn.find_one,spec_or_id,fields = fields)
+                fields = {"_id":True,"del_flag":False}
+        
+        result = self.db_conn.find_one(filter = spec_or_id,projection = fields)
         callback(result)
+    
     
     @tornado.gen.engine
     def insert_one(self,doc,callback=None):
@@ -72,7 +77,7 @@ class BaseModel():
         else:
             callback(None)
         
-        result = self.db_conn.insert(doc)
+        result = self.db_conn.insert_one(doc)
         callback(result)
     
     @tornado.gen.engine

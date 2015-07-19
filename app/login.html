@@ -1,0 +1,331 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Docker中文翻译社区</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <!-- build:css(.) styles/vendor.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css(.tmp) styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+  </head>
+  <body ng-app="angularApp">
+    <!--[if lte IE 8]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <!-- Add your site or application content here -->
+    <div class="header">
+      <div class="navbar navbar-newstyle" role="navigation">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#js-navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#/" ng-click="activeNav='/'">
+                <span class="glyphicon glyphicon-cloud" style="color:#e9e9e9;"></span>&nbsp;Docker</a>
+          </div>
+          <div class="collapse navbar-collapse" id="js-navbar-collapse">
+            <ul class="nav navbar-nav text-center">
+              <li  ng-class="{true: 'active', false: ''}[activeNav=='/']"><a href="#/" ng-click="activeNav='/'">首页</a></li>
+              <li ng-class="{true: 'active', false: ''}[activeNav=='/book']"><a ng-href="#/book" ng-click="activeNav='/book'">文档阅读</a></li>
+              <li ng-class="{true: 'active', false: ''}[activeNav=='/code']"><a ng-href="#/code" ng-click="activeNav='/code'">代码托管</a></li>
+              <li ng-class="{true: 'active', false: ''}[activeNav=='/cicd']"><a ng-href="#/cicd" ng-click="activeNav='/cicd'">持续集成</a></li>
+              <li ng-class="{true: 'active', false: ''}[activeNav=='/images']"><a ng-href="#/images" ng-click="activeNav='/images'">镜像管理</a></li>
+              <li ng-class="{true: 'active', false: ''}[activeNav=='/containers']"><a ng-href="#/containers" ng-click="activeNav='/containers'">应用管理</a></li>
+              <li ng-class="{true: 'active', false: ''}[activeNav=='/registry']"><a ng-href="#/registry" ng-click="activeNav='/registry'">加速器</a></li>
+              <li ng-class="{true: 'active', false: ''}[activeNav=='/about']"><a ng-href="#/about" ng-click="activeNav='/about'">关于</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+      
+    <div class="container-fluid" style="width:350px;background-color:#fff;margin-top:60px;margin-bottom:120px;padding:30px;"  ng-controller="LoginController">
+        <div ng-show="showScope=='signin' ">
+            <div class="row">
+                 <h2 class="text-center">登录</h2>
+            </div>
+            <form name="signinForm" role="form" ng-submit="submitSignin(signinForm.$valid)"  novalidate>
+                <div class="form-group  has-feedback">
+                    <input class="form-control" placeholder="请输入用户名或者邮件" type="text" name="name_or_email" ng-model="signin.name" required />
+                    <span class="glyphicon glyphicon-ok form-control-feedback" ng-show="signinForm.name_or_email.$dirty && signinForm.name_or_email.$valid"></span>
+                </div>
+                <div class="form-group  has-feedback">
+                    <input class="form-control" placeholder="请输入密码" type="password" name="password" ng-model="signin.password" required/>
+                    <span class="glyphicon glyphicon-ok form-control-feedback" ng-show="signinForm.password.$dirty && signinForm.password.$valid"></span>
+                </div>
+                <div class="form-group">
+                    <input class="form-control btn btn-primary"  type="submit" value="登录"/>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-6">
+                        <a class="btn btn-link"  ng-click="showScope='signup'">注册新用户</a>
+                    </div>
+                    <div class="col-xs-6">
+                        <a class="btn btn-link"  ng-click="showScope='forget'">忘记密码</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div ng-show="showScope=='signup' ">
+            <div class="row">
+                <h2  class="text-center">注册</h2>
+            </div>
+            <form name="signupForm" role="form" ng-submit="submitSignup(signupForm.$valid)"  novalidate>
+                <div class="form-group  has-feedback">
+                    <input class="form-control" placeholder="请输入用户名" type="text"  name="name" ng-model="signup.name" required/>
+                    <span class="glyphicon glyphicon-ok form-control-feedback" ng-show="signupForm.name.$dirty && signupForm.name.$valid"></span>
+                </div>
+                <div class="form-group  has-feedback">
+                    <input class="form-control" placeholder="请输入邮件" type="email" name="email" ng-model="signup.email" required/>
+                    <span class="glyphicon glyphicon-ok form-control-feedback" ng-show="signupForm.email.$dirty && signupForm.email.$valid"></span>
+                </div>
+                <div class="form-group  has-feedback">
+                    <input class="form-control" placeholder="请输入密码" type="password" name="password" ng-model="signup.password" required/>
+                    <span class="glyphicon glyphicon-ok form-control-feedback" ng-show="signupForm.password.$dirty && signupForm.password.$valid"></span>
+                </div>
+                <div class="form-group  has-feedback">
+                    <input class="form-control" placeholder="请输入重复密码" type="password" name="repwd" ng-model="signup.repwd" required/>
+                     <span class="glyphicon glyphicon-ok form-control-feedback" 
+                           ng-show="signupForm.password.$dirty && signupForm.password.$valid 
+                                    && signupForm.repwd.$dirty && signupForm.repwd.$valid 
+                                    && signup.repwd== signup.password"></span>
+                </div>
+                <div class="form-group">
+                    <input class="form-control btn btn-primary"  type="submit" value="注册"/>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-6">
+                        <a class="btn btn-link"  ng-click="showScope='signin'">返回</a>
+                    </div>
+                    <div class="col-xs-6">
+<!--                        <a class="btn btn-link"  ng-click="showScope='forget'">忘记密码</a>-->
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div ng-show="showScope=='forget' ">
+            <div class="row">
+                  <h2  class="text-center">忘记密码</h2>
+            </div>
+            <form name="forgetForm" role="form" ng-submit="submitForget(forgetForm.$valid)"  novalidate>
+                <div class="form-group has-feedback">
+                    <input class="form-control" placeholder="请输入邮件" type="email" name="email" ng-model="signup.email" required/>
+                    <span class="glyphicon glyphicon-ok form-control-feedback" ng-show="forgetForm.email.$dirty && forgetForm.email.$valid"></span>
+                </div>
+                <div class="form-group">
+                    <input class="form-control btn btn-primary"  type="submit" value="重置密码"/>
+                </div>
+                <div class="form-group">
+                    <div class="col-xs-6">
+                        <a class="btn btn-link"  ng-click="showScope='signin'">返回</a>
+                    </div>
+                    <div class="col-xs-6">
+<!--                        <a class="btn btn-link"  ng-click="showScope='forget'">忘记密码</a>-->
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer text-center">
+      <div class="container-fluid">
+        <p><span class="glyphicon glyphicon-heart"></span>Docker中文翻译社区</p>
+      </div>
+    </div>
+
+
+    <!-- build:js(.) scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
+    <script src="bower_components/angular-aria/angular-aria.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="bower_components/angular-messages/angular-messages.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+    <script src="bower_components/angular-touch/angular-touch.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+    <script>
+        /**
+ * @ngdoc overview
+ * @name angularApp
+ * @description
+ * # angularApp
+ *
+ * Main module of the application.
+ */
+var angularApp = angular
+  .module('angularApp', [
+    'ngAnimate',
+    'ngAria',
+    'ngCookies',
+    'ngMessages',
+    'ngResource',
+    'ngRoute',
+    'ngSanitize',
+    'ngTouch'
+  ]);
+
+ angularApp.config(function($interpolateProvider) {
+    $interpolateProvider.startSymbol('[[');
+    $interpolateProvider.endSymbol(']]');
+  });
+
+angularApp.config(function($httpProvider) {
+     $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+     $httpProvider.defaults.headers.put['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
+     $httpProvider.defaults.headers.common["Accept"] = 'application/json, text/plain, * / *';
+     $httpProvider.defaults.headers.common["x-Requested-With"] = "XMLHttpRequest";
+      $httpProvider.defaults.transformRequest = [function(data) {
+        return angular.isObject(data) && String(data) !== '[object File]' ? param(data) : data;
+      }];
+});
+angularApp.factory("config",function(){
+    var config = {
+        envirement:"dev",
+        dev:{
+            hrefs:{
+                book:"http://localhost:4000",
+                code:"http://localhost:10080",
+                test:"http://localhost:10081"
+            }
+        },
+        pro:{
+            hrefs:{
+                book:"http://docs.dockerdocs.cn",
+                code:"http://gitlab.dockerdocs.cn",
+                test:"http://gitlabci.dockerdocs.cn"
+            }
+        }
+    }
+    return config;
+});
+angularApp.config(function($sceDelegateProvider) {
+  $sceDelegateProvider.resourceUrlWhitelist([
+    // Allow same origin resource loads.
+    'self',
+    // Allow loading from our assets domain.  Notice the difference between * and **.
+    'http://*.dockerdocs.cn/**',
+    'http://*.docker.io/**',
+    'http://*.docker.com/**',
+    'http://localhost:4000/**',   // gitbook
+    'http://localhost:10080/**',  // gitlab
+    'http://localhost:10081/**',  // gitlab ci
+  ]);
+});  
+
+angularApp.controller('LoginController',["$scope","Signin","Signup","Forget","$window",function($scope,Signin,Signup,Forget,$window){
+    $scope.scopeList = ["signup","signin","forget"];
+    $scope.showScope = 'signin';
+    $scope.signin = { error:false, msg:"", name:"", password:"" };
+    $scope.signup = { error:false, msg:"", name:"", password:"",email:"",repwd:"" };  
+    $scope.forget = { error:false, msg:"", email: "" };
+    $scope.submitSignin = function(isValid){
+        if (!isValid) {
+            alert('验证失败');
+        }else{
+            Signin.submit(null,$.param({
+                "name_or_email":$scope.signin.name,
+                "password":$scope.signin.password
+            }),function(res){
+                if(res && res.status == "success"){
+                    $window.location = "/";
+                }else{
+                    $scope.signin.error = true;
+                    $scope.signin.msg = res.msg;
+                }
+            },function(e,err){
+                $scope.signin.error = true;
+                $scope.signin.msg = '服务器错误';
+            });
+        }
+    }
+    $scope.submitSignup = function(isValid){
+        if (!isValid) {
+            alert('验证失败');
+        }else{
+            Signup.submit(null,$.param({
+                "name":$scope.signup.name,
+                "email":$scope.signup.email,
+                "password":$scope.signup.password
+            }),function(res){
+                if(res && res.status == "success"){
+                    alert("申请用户成功，请返回登录");   
+                    $scope.signin = { error:false, msg:"", name:"", password:"" };
+                }else{
+                    $scope.signup.error = true;
+                    $scope.signup.msg = res.msg;
+                }
+            },function(e,err){
+                $scope.signup.error = true;
+                $scope.signup.msg = '服务器错误';
+            });
+        }
+    }    
+    $scope.submitForget = function(isValid){
+        if (!isValid) {
+            alert('验证失败');
+        }else{
+            Forget.submit(null,$.param({
+                "email":$scope.forget.email
+            }),function(res){
+                if(res && res.status == "success"){
+                    alert("发送邮件成功，请登录邮箱查看");   
+                    $scope.signin = { error:false, msg:"", name:"", password:"" };
+                }else{
+                    $scope.forget.error = true;
+                    $scope.forget.msg = res.msg;
+                }
+            },function(e,err){
+                $scope.forget.error = true;
+                $scope.forget.msg = '服务器错误';
+            });
+        }
+    }
+}]);
+        
+        
+angularApp.factory('Signin',["$resource",function($resource){
+    return $resource('/api/user/signin',{},{
+        submit:{
+            method:"POST",
+            isArray:false
+        }
+    });
+}]);
+        
+angularApp.factory('Signup',["$resource",function($resource){
+    return $resource('/api/user/signup',{},{
+        submit:{
+            method:"POST",
+            isArray:false
+        }
+    });
+}]);
+        
+angularApp.factory('Forget',["$resource",function($resource){
+    return $resource('/api/user/forget',{},{
+        submit:{
+            method:"POST",
+            isArray:false
+        }
+    });
+}]);
+    </script>
+</body>
+</html>

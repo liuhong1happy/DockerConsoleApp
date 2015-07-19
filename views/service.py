@@ -8,34 +8,30 @@ import json
 from util.rabbitmq import send_message
 from stormed import Message
 import settings
+from views import AsyncBaseHandler
 
-class ServiceHandler(tornado.web.RequestHandler):
+class ServiceHandler(AsyncBaseHandler):
     s_service = ServiceService()
-    @tornado.web.asynchronous
-    @tornado.gen.engine
-    def get(self):
+    fields={
+        "name":True,
+        "user":True,
+        "image":True,
+        "ports":True,
+        "envirements":True,
+        "logo":True
+    }
+    
+    def _get_(self):
         service_id = self.get_argument("id")
-        fields={
-            "name":True,
-            "user":True,
-            "image":True,
-            "ports":True,
-            "envirements":True,
-            "logo":True
-        }
-        
-        service = tornado.gen.Task(self.s_service.get_one,service_id,fields=fields)
-        _json = ""
+        service = tornado.gen.Task(self.s_service.get_one,service_id,fields=self.fields)
         if not service:
-            _json = tornado.escape.json_decode({"status":"error","error_code":404})
+            self.render_error(error_code=404,msg="not data")
         else:
-            _json = tornado.escape.json_decode({"status":"success","data":service})
-        self.write(_json)
-        self.finish()
+            self.write_result(data=service)
     
     @tornado.web.asynchronous
     @tornado.gen.engine
-    def post(self):
+    def _post_(self):
         git_path = self.get_argument("git_path",None)
         name = self.get_argument("service_name",None)
         user_name = self.get_argument("user_name","admin")
@@ -58,33 +54,39 @@ class ServiceHandler(tornado.web.RequestHandler):
         }) )
         
         send_message(msg,settings.CREATE_SERVICE_EXCHANGE,settings.CREATE_SERVICE_ROUTING)
-        _json = ""
+        
         if not result:
-            _json = json.dumps({"status":"error","error_code":404})
+            self.render_error(error_code=404,msg="not data")
         else:
             insertData["_id"] = str(result)
-            _json = json.dumps({"status":"success","data":insertData})
-        self.write(_json)
-        self.finish()
+            self.write_result(data=insertData)
     
-class GetServiceLogsHandler(tornado.web.RequestHandler):
-    def get(self):
+class GetServiceLogsHandler(AsyncBaseHandler):
+    def _get_(self):
         service_id = self.get_argument("id")
         fields={
             "logs":True,
             "status":True
         }
         service = tornado.gen.Task(s_service.get_one,service_id,fields=fields)
-        
         if not service:
-            json = json.dumps({"status":"error","error_code":404})
+            self.render_error(error_code=404,msg="not data")
         else:
-            json = json.dumps({"status":"success","data":service})
-        self.write(json)
-        self.finish()
+            self.write_result(data=service)
+
     
-class ServicesHandler(tornado.web.RequestHandler):
+class ServicesHandler(AsyncBaseHandler):
     s_service = ServiceService()
+    fields={
+        "name":True,
+        "user":True,
+        "image":True,
+        "code":True,
+        "status":True,
+        "logs":True,
+        "update_time":True,
+        'create_time':True
+    }
     
     @tornado.web.asynchronous
     @tornado.gen.engine
@@ -95,22 +97,9 @@ class ServicesHandler(tornado.web.RequestHandler):
         page_size =int(self.get_argument("page_size",20))
         spec ={}
         spec[spec_type]={ '$regex' : spec_text}
-        fields={
-            "name":True,
-            "user":True,
-            "image":True,
-            "code":True,
-            "status":True,
-            "logs":True,
-            "update_time":True,
-            'create_time':True
-        }
-
-        services =yield tornado.gen.Task(self.s_service.get_list,spec,fields=fields,page_index=page_index,page_size=page_size)
+        services =yield tornado.gen.Task(self.s_service.get_list,spec,fields=self.fields,page_index=page_index,page_size=page_size)
         _json = ""
         if not services:
-            _json =json.dumps({"status":"error","error_code":404})
+            self.render_error(error_code=404,msg="not data")
         else:
-            _json = json.dumps({"status":"success","data":services})
-        self.write(_json)
-        self.finish()
+            self.write_result(data=services)

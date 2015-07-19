@@ -18,14 +18,19 @@ define("ioloop",default=None,help="global ioloop instance",type=object)
 class Application(tornado.web.Application):
     def __init__(self):
         self.init_service()
-        
+        from views.home import HomeHandler
         from views.service import ServicesHandler,ServiceHandler
+        from views.login import LoginHandler,SigninHandler,SignupHandler,ForgetHandler
         handlers = [
-            (r"/", HomeHandler),
+             (r"/", HomeHandler),
+             (r"/login",LoginHandler),
+             (r"/api/user/signup",SignupHandler),
+             (r"/api/user/signin",SigninHandler),
+             (r"/api/user/forget",ForgetHandler),
             (r"/api/services",ServicesHandler),
             (r"/api/service",ServiceHandler)
         ]
-        settings = dict(
+        _settings = dict(
             blog_title=u"Docker中文翻译社区",
             template_path=os.path.join(os.path.dirname(__file__), "dist"),
             static_path=os.path.join(os.path.dirname(__file__), "dist"),
@@ -33,19 +38,27 @@ class Application(tornado.web.Application):
             cookie_secret="AAAAB3NzaC1yc2EAAAADAQABAAABAQCww",
             login_url="/login",
             debug=True,
+            pycket = {
+                'engine': 'redis',
+                'storage': {
+                    'host': settings.REDIS_HOST,
+                    'port':  settings.REDIS_PORT,
+                    'db_sessions': 10,
+                    'db_notifications': 11,
+                    'max_connections': 2 ** 31,
+                },
+                'cookies': {
+                    'expires_days': 120,
+                },
+            },
         )
-        tornado.web.Application.__init__(self, handlers, **settings)
+        tornado.web.Application.__init__(self, handlers, **_settings)
     
     def init_service(self):
         init_db()
         init_etcd()
         init_docker()
         init_amqp()
-
-class HomeHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.render("index.html")
-        
 
 def main():
     tornado.options.parse_command_line()
