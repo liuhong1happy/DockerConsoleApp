@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import tornado.web
+import tornado.gen
 from pycket.session import SessionMixin
 import json
 
@@ -19,11 +20,12 @@ class BaseHandler(tornado.web.RequestHandler, SessionMixin):
         self.write(json.dumps({"status":"error","error_code":error_code,'msg':msg}))
         self.finish()
         
-class AsyncBaseHandler(BaseHandler):
-    def _post_(self):
-        pass
 
+class AsyncBaseHandler(BaseHandler):
     def _get_(self):
+        pass
+    
+    def _post_(self):
         pass
     
     def _put_(self):
@@ -37,7 +39,6 @@ class AsyncBaseHandler(BaseHandler):
     def get(self):
         if self.current_user is None:
             self.render_error(error_code=1101,msg="API调用失败,请登录")
-            self.finish()
         else:
             self._get_()
         
@@ -46,7 +47,6 @@ class AsyncBaseHandler(BaseHandler):
     def post(self):
         if self.current_user is None:
             self.render_error(error_code=1101,msg="API调用失败,请登录")
-            self.finish()
         else:
             self._post_()
 
@@ -55,7 +55,6 @@ class AsyncBaseHandler(BaseHandler):
     def put(self):
         if self.current_user is None:
             self.render_error(error_code=1101,msg="API调用失败,请登录")
-            self.finish()
         else:          
             self._put_()
 
@@ -64,6 +63,5 @@ class AsyncBaseHandler(BaseHandler):
     def delete(self):
         if self.current_user is None:
             self.render_error(error_code=1101,msg="API调用失败,请登录")
-            self.finish()
         else:    
             self._delete_()        

@@ -1,5 +1,4 @@
 import logging 
-import asyncmongo
 from tornado.options import define, options
 import settings
 from pymongo import MongoClient

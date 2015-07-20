@@ -73,6 +73,7 @@ class GetServiceLogsHandler(AsyncBaseHandler):
             self.write_result(data=service)
 
 class ServicesHandler(AsyncBaseHandler):
+    
     s_service = ServiceService()
     fields={
         "name":True,
@@ -84,6 +85,7 @@ class ServicesHandler(AsyncBaseHandler):
         "update_time":True,
         'create_time':True
     }
+    
     def _get_(self):
         spec_type = self.get_argument("spec_type","name")
         spec_text =  self.get_argument("spec_text","")
@@ -92,7 +94,6 @@ class ServicesHandler(AsyncBaseHandler):
         spec ={}
         spec[spec_type]={ '$regex' : spec_text}
         services =yield tornado.gen.Task(self.s_service.get_list,spec,fields=self.fields,page_index=page_index,page_size=page_size)
-        _json = ""
         if not services:
             self.render_error(error_code=404,msg="not data")
         else:
