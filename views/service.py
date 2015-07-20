@@ -29,12 +29,10 @@ class ServiceHandler(AsyncBaseHandler):
         else:
             self.write_result(data=service)
     
-    @tornado.web.asynchronous
-    @tornado.gen.engine
     def _post_(self):
         git_path = self.get_argument("git_path",None)
         name = self.get_argument("service_name",None)
-        user_name = self.get_argument("user_name","admin")
+        user_name = self.current_user.get("name","admin")
                 
         # 数据库操作
         insertData = {}
@@ -43,8 +41,8 @@ class ServiceHandler(AsyncBaseHandler):
         insertData["user"] = user_name
         insertData["status"] = 'created'
         
-        # result= yield tornado.gen.Task(self.s_service.insert_service,insertData)
-        result = None
+        result= yield tornado.gen.Task(self.s_service.insert_service,insertData)
+        
         # 加入队列
         msg = Message( json.dumps({
             "code":git_path,
@@ -74,7 +72,6 @@ class GetServiceLogsHandler(AsyncBaseHandler):
         else:
             self.write_result(data=service)
 
-    
 class ServicesHandler(AsyncBaseHandler):
     s_service = ServiceService()
     fields={
@@ -87,10 +84,7 @@ class ServicesHandler(AsyncBaseHandler):
         "update_time":True,
         'create_time':True
     }
-    
-    @tornado.web.asynchronous
-    @tornado.gen.engine
-    def get(self):
+    def _get_(self):
         spec_type = self.get_argument("spec_type","name")
         spec_text =  self.get_argument("spec_text","")
         page_index =int(self.get_argument("page_index",0))
