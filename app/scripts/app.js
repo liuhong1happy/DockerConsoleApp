@@ -74,14 +74,25 @@ angularApp.factory("config",function(){
             hrefs:{
                 book:"http://localhost:4000",
                 code:"http://localhost:10080",
-                test:"http://localhost:10081"
+                test:"http://localhost:10081",
+            },
+            gitlab:{
+                token:"http://localhost:10080/oauth/authorize",
+                client_id:"9c7a33a2ed9dbe2ef77d91f9fd9c27de495ad8a68ae0609556401b09f7245d98",
+                redirect_uri:"http://localhost:8888/api/gitlab/token",
             }
         },
         pro:{
             hrefs:{
                 book:"http://docs.dockerdocs.cn",
                 code:"http://gitlab.dockerdocs.cn",
-                test:"http://gitlabci.dockerdocs.cn"
+                test:"http://gitlabci.dockerdocs.cn",
+
+            },
+            gitlab:{
+                token:"http://gitlab.dockerdocs.cn/oauth/authorize",
+                client_id:"9c7a33a2ed9dbe2ef77d91f9fd9c27de495ad8a68ae0609556401b09f7245d98",
+                redirect_uri:"http://gitlab.dockerdocs.cn/api/gitlab/token",
             }
         }
     }

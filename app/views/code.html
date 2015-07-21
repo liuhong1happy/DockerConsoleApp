@@ -1,1 +1,29 @@
-
+<div class="row" style="margin:20px 120px;">
+    <h2>代码托管</h2>
+    <p>我们需要获取你gitlab代码库列表，以便实现镜像自动构建、持续集成和自动部署</p>
+    <a class="btn btn-success" ngHref="[[authLink]]">开启托管</a>
+    <hr />
+</div>
+<div class="row" ngShow="has_token">
+<!--
+        <table class="table">
+        <thead>
+            <tr>
+                <td>任务名称</td>
+                <td>代码源</td>
+                <td>构建状态</td>
+                <td>镜像名称</td>
+                <td>更新时间</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="project in projects">
+                <td>[[project.name]]</td>
+                <td>[[project.code]]</td>
+                <td>[[project.status]]</td>
+                <td>[[project.image]]</td>
+            </tr>
+        </tbody>
+    </table>
+-->
+</div>

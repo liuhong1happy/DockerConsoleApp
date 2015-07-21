@@ -7,21 +7,35 @@
  * # CodeCtrl
  * Controller of the angularApp
  */
-angularApp.controller('CodeCtrl', ["$scope","config","$timeout","$window", function ($scope,config,$timeout,$window) {
+angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken", function ($scope,config,$window,GitLabToken) {
     var env = config.envirement;
-    $scope.gitlab = config[env].hrefs.code;   
-    
-    var resizeFunc = function(){
-            var width = $($window).width();
-            var height = $($window).height();
-            $scope.gitlab_width = width;
-            $scope.gitlab_height  = height-140;
-            $scope.$apply();
-    }
-    
-    $timeout(function(){
-        resizeFunc();
-    },10);
-     
-    $window.onresize =resizeFunc;
+    var token = config[env].gitlab.token;
+    var client_id = config[env].gitlab.client_id;
+    var redirect_uri = config[env].gitlab.redirect_uri;
+    var encodeUri = $window.encodeURIComponent(redirect_uri);
+    $scope.authLink = token+ "?client_id="+client_id+"&redirect_uri="+encodeUri+"&response_type=code";
+    GitLabToken.getToken({},function(res){
+        if(res && res.status=="success"){
+            if(res.data && res.data.access_token){
+                $scope.hasToken = true; 
+                // 根据token获取代码库列表
+            }else{
+                $scope.hasToken = false; 
+            }
+        }else{
+            alert("服务器异常");
+        }
+    },function(e,err){
+        alert("服务器错误");
+    });
+}]);
+
+angularApp.factory('GitLabToken',["$resource",function($resource){
+    return $resource('/api/gitlab/token',{
+    },{
+        "getToken":{
+            method:"GET",
+            isArray:false
+        }
+    });
 }]);

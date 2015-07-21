@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from services.user import UserService
+from services.oauth import OAuthService
 import tornado.web
 import tornado.gen
 import tornado.escape
@@ -8,11 +8,24 @@ import json
 from util.rabbitmq import send_message
 from stormed import Message
 import settings
-from views import AsyncBashHandler
+from views import AsyncBaseHandler
 
-class GitLabOAuthHandler(AsyncBashHandler):
+class GitLabOAuthHandler(AsyncBaseHandler):
     s_oauth = OAuthService()
-    
+    @tornado.gen.engine
+    def _get_(self):
+        user_id = self.current_user.get('_id',None)
+        if user_id is None:
+            render_error(error_code=404,msg='not user data')
+            return
+        
+        token = yield tornado.gen.Task(self.s_oauth.get_gitlab_token,user_id)
+        
+        if token is None:
+            self.write_result(data=token)
+        else:
+            self.render_error(error_code=404,msg='not user data')
+
     @tornado.gen.engine
     def _post_(self):
         access_token = self.get_argument('access_token')
@@ -35,3 +48,5 @@ class GitLabOAuthHandler(AsyncBashHandler):
             write_result(data=user)
         else:
             render_error(error_code=404,msg='not user data')
+            
+

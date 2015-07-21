@@ -20,11 +20,6 @@ class BaseModel():
         if not hasattr(self,"key"):
             self.key = "_id"
         self.db_conn  = self.db_client[self.db][self.table]
-        
-    
-
-        
-
 
     @tornado.gen.engine
     def get_list(self,spec,fields=None,sorts=None,skip=0,limit=20,callback=None):
@@ -57,11 +52,10 @@ class BaseModel():
             spec_or_id["del_flag"] = {'$exists': 'False' }
             
         if(fields==None or not isinstance(fields,dict)):
-            if not hasattr(self,"fields"):
+            if hasattr(self,"fields"):
                 fields = self.fields
             else:
                 fields = {"_id":True,"del_flag":False}
-        
         result = self.db_conn.find_one(filter = spec_or_id,projection = fields)
         callback(result)
     
