@@ -20,7 +20,7 @@ class ServiceHandler(AsyncBaseHandler):
         "envirements":True,
         "logo":True
     }
-    
+    @tornado.gen.engine
     def _get_(self):
         service_id = self.get_argument("id")
         service = tornado.gen.Task(self.s_service.get_one,service_id,fields=self.fields)
@@ -28,7 +28,7 @@ class ServiceHandler(AsyncBaseHandler):
             self.render_error(error_code=404,msg="not data")
         else:
             self.write_result(data=service)
-    
+    @tornado.gen.engine
     def _post_(self):
         git_path = self.get_argument("git_path",None)
         name = self.get_argument("service_name",None)
@@ -60,6 +60,7 @@ class ServiceHandler(AsyncBaseHandler):
             self.write_result(data=insertData)
     
 class GetServiceLogsHandler(AsyncBaseHandler):
+    @tornado.gen.engine
     def _get_(self):
         service_id = self.get_argument("id")
         fields={
@@ -85,7 +86,7 @@ class ServicesHandler(AsyncBaseHandler):
         "update_time":True,
         'create_time':True
     }
-    
+    @tornado.gen.engine
     def _get_(self):
         spec_type = self.get_argument("spec_type","name")
         spec_text =  self.get_argument("spec_text","")
