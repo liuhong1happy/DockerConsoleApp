@@ -8,7 +8,7 @@ class UserModel(BaseModel):
         "name":True,
         "email":True,
         "password":True,
-        "gitlab":True,
+        "gitlab_token":True,
         "last_time":True,
         "login_time":True,
         "create_time":True
