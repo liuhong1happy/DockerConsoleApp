@@ -11,22 +11,7 @@ class ServiceService():
     def insert_service(self,service,callback=None):
         model = yield tornado.gen.Task(self.m_service.insert_one,service)
         callback(model)
-        
-    def exist_user(self,name,user,callback=None):
-        result = yield tornado.gen.Task(m_service.find_one,{"name":name,"user":user})
-        
-        if result==None or not isinstance(result,dict):
-            callback(False)
-        else:
-            callback(True)
-    
-    def get_user(self,name,user,callback=None):
-        result = yield tornado.gen.Task(m_service.find_one,{"name":name,"user":user})
-        if result==None or not isinstance(result,dict):
-            callback(None)
-        else:
-            callback(result)
-            
+
     @tornado.gen.engine
     def get_list(self,spec,fields=None,sorts=None,page_index=0,page_size=20,callback=None):
 
