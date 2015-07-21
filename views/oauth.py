@@ -16,7 +16,22 @@ class GitLabOAuthHandler(AsyncBashHandler):
     @tornado.gen.engine
     def _post_(self):
         access_token = self.get_argument('access_token')
-        gitlab_user = self.get_argument('user')
-        current_user = self.current_user.get('_id','admin')
+        token_type = self.get_argument('token_type')
+        expires_in = self.get_argument('expires_in')
+        refresh_token = self.get_argument('expires_in')
+        user_id = self.current_user.get('_id',None)
+        if user_id is None:
+            render_error(error_code=404,msg='not user data')
+            return
         
-        user = yield tornado.gen.Task(self.s_oauth.update,current_user,{} )
+        user = yield tornado.gen.Task(self.s_oauth.udpate_gitlab_token,user_id,{
+          "access_token":access_token,
+          "token_type":token_type,
+          "expires_in":expires_in,
+          "refresh_token":refresh_token
+        })
+        
+        if user is None:
+            write_result(data=user)
+        else:
+            render_error(error_code=404,msg='not user data')
