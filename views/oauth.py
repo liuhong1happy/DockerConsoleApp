@@ -10,7 +10,27 @@ from stormed import Message
 import settings
 from views import AsyncBaseHandler
 
-class GitLabOAuthHandler(AsyncBaseHandler):
+class GitLabAuthHandler(AsyncBaseHandler):
+    @tornado.gen.engine
+    def _get_(self):
+        return_code = self.get_argument('code')
+        user_id = self.current_user.get('_id',None)
+        if user_id is None:
+            render_error(error_code=404,msg='not user data')
+            return
+        
+        user = yield tornado.gen.Task(self.s_oauth.udpate_gitlab_token,user_id,{
+          "code":code
+        })
+        
+        if user is None:
+            write_result(data=user)
+        else:
+            render_error(error_code=404,msg='not user data')
+  
+
+
+class GitLabTokenHandler(AsyncBaseHandler):
     s_oauth = OAuthService()
     @tornado.gen.engine
     def _get_(self):
