@@ -9,6 +9,11 @@ from util.rabbitmq import send_message
 from stormed import Message
 import settings
 from views import AsyncBaseHandler
+import libcurl
+import pycurl
+import tornado.curl_httpclient
+
+AsyncHTTPClient.configure('tornado.curl_httpclient.CurlAsyncHTTPClient')
 
 class GitLabAuthHandler(AsyncBaseHandler):
     @tornado.gen.engine
@@ -18,17 +23,21 @@ class GitLabAuthHandler(AsyncBaseHandler):
         if user_id is None:
             render_error(error_code=404,msg='not user data')
             return
-        
         user = yield tornado.gen.Task(self.s_oauth.udpate_gitlab_token,user_id,{
           "code":code
         })
-        
-        if user is None:
-            write_result(data=user)
+        # 使用http client请求token
+        respose = yield tornado.gen.Task(self.request_token,code)
+        if respose is None:
+            write_result(data=respose)
         else:
             render_error(error_code=404,msg='not user data')
-  
-
+    
+    @tornado.gen.engine
+    def request_token(self,code,callback=None):
+        http_client = AsyncHTTPClient()
+        response = yield gen.Task(http_client.fetch, "http://example.com",method=POST, body=json.dumps(data))
+        callback(response)
 
 class GitLabTokenHandler(AsyncBaseHandler):
     s_oauth = OAuthService()
