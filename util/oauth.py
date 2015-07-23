@@ -24,7 +24,6 @@ class GitLabOAuth2Mixin(OAuth2Mixin):
                    method="POST", headers={'Content-Type': 'application/x-www-form-urlencoded'}, body=body)
 
     def _on_access_token(self, future, response):
-        """Callback function for the exchange to the access token."""
         if response.error:
             future.set_exception(AuthError('Google auth error: %s' % str(response)))
             return
