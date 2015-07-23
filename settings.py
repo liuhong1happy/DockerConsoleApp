@@ -49,10 +49,10 @@ GITLAB_OAUTH = {
     "authorize_url":GITLAB_SITE_URL+"/oauth/authorize",
     "access_token_url":GITLAB_SITE_URL+"/oauth/token",
     "user_info_url":GITLAB_SITE_URL+"/api/v3/user",
+    "redirect_url":SITE_URL+'/api/gitlab/oauth',
     "key":'9c7a33a2ed9dbe2ef77d91f9fd9c27de495ad8a68ae0609556401b09f7245d98',
     "secret":'2b389ac2adb9a296981bc150aac272bc053f9f2ff3f8a8e79dba444240e4aabf'
 }
-GITLAB_REDIRECT_URI = SITE_URL+'/api/gitlab/oauth'
 
 # redis 
 REDIS_HOST = '192.168.0.103'
