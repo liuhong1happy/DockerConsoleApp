@@ -30,7 +30,7 @@ class Application(tornado.web.Application):
              (r"/api/user/forget",ForgetHandler),
             (r"/api/services",ServicesHandler),
             (r"/api/service",ServiceHandler),
-            (r"/api/gitlab/token",GitLabOAuthHandler)
+            (r"/api/gitlab/oauth",GitLabOAuthHandler)
         ]
         _settings = dict(
             blog_title=u"Docker中文翻译社区",
