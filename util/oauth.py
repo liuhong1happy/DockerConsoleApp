@@ -1,13 +1,16 @@
-from tornado.auth import OAuth2Mixin,_auth_return_future
+from tornado.auth import OAuth2Mixin,_auth_return_future,AuthError
 from tornado.concurrent import return_future
 import settings
+import urllib as urllib_parse
+from tornado import httpclient,escape
+import functools
 
 class GitLabOAuth2Mixin(OAuth2Mixin):
-    _OAUTH_SETTINGS_KEY = 'GITLAB_OAUTH'
-    _OAUTH_AUTHORIZE_URL = settings[self._OAUTH_SETTINGS_KEY]['authorize_url']
-    _OAUTH_ACCESS_TOKEN_URL = settings[self._OAUTH_SETTINGS_KEY]['access_token_url']
-    _OAUTH_USERINFO_URL = settings[self._OAUTH_SETTINGS_KEY]['user_info_url']
-    _OAUTH_REDIRECT_URL = settings[self._OAUTH_SETTINGS_KEY]['redirect_url']
+
+    _OAUTH_AUTHORIZE_URL = settings.GITLAB_OAUTH['authorize_url']
+    _OAUTH_ACCESS_TOKEN_URL = settings.GITLAB_OAUTH['access_token_url']
+    _OAUTH_USERINFO_URL = settings.GITLAB_OAUTH['user_info_url']
+    _OAUTH_REDIRECT_URL = settings.GITLAB_OAUTH['redirect_url']
     _OAUTH_NO_CALLBACKS = False
     
     @_auth_return_future
@@ -16,18 +19,24 @@ class GitLabOAuth2Mixin(OAuth2Mixin):
         body = urllib_parse.urlencode({
             "redirect_uri": self._OAUTH_REDIRECT_URL,
             "code": code,
-            "client_id": settings[self._OAUTH_SETTINGS_KEY]['key'],
-            "client_secret": settings[self._OAUTH_SETTINGS_KEY]['secret'],
+            "client_id": settings.GITLAB_OAUTH['key'],
+            "client_secret": settings.GITLAB_OAUTH['secret'],
             "grant_type": "authorization_code",
         })
-
+        
         http.fetch(self._OAUTH_ACCESS_TOKEN_URL,
                    functools.partial(self._on_access_token, callback),
                    method="POST", headers={'Content-Type': 'application/x-www-form-urlencoded'}, body=body)
-
+    def _on_oauth2_request(self, future, response):
+        if response.error:
+            future.set_exception(AuthError("Error response %s fetching %s" %
+                                           (response.error, response.request.url)))
+            return
+        future.set_result(escape.json_decode(response.body))
+        
     def _on_access_token(self, future, response):
         if response.error:
-            future.set_exception(AuthError('Google auth error: %s' % str(response)))
+            future.set_exception(AuthError('Gitlab auth error: %s' % str(response)))
             return
 
         args = escape.json_decode(response.body)
@@ -37,7 +46,7 @@ class GitLabOAuth2Mixin(OAuth2Mixin):
     def authorize_redirect(self,extra_params=None,callback=None):
         args = {
             "redirect_uri": self._OAUTH_REDIRECT_URL,
-            "client_id": settings[self._OAUTH_SETTINGS_KEY]['key'],
+            "client_id": settings.GITLAB_OAUTH['key'],
             "response_type": "code"
         }
         self.redirect(url_concat(self._OAUTH_AUTHORIZE_URL, args))
@@ -60,3 +69,7 @@ class GitLabOAuth2Mixin(OAuth2Mixin):
                        callback=callback)
         else:
             http.fetch(url, callback=callback)
+    
+
+    def get_auth_http_client(self):
+        return httpclient.AsyncHTTPClient()

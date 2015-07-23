@@ -35,7 +35,6 @@ class AsyncBaseHandler(BaseHandler):
         pass
     
     @tornado.web.asynchronous
-    @tornado.gen.engine
     def get(self):
         if self.current_user is None:
             self.render_error(error_code=1101,msg="API调用失败,请登录")
@@ -43,7 +42,6 @@ class AsyncBaseHandler(BaseHandler):
             self._get_()
         
     @tornado.web.asynchronous
-    @tornado.gen.engine
     def post(self):
         if self.current_user is None:
             self.render_error(error_code=1101,msg="API调用失败,请登录")
@@ -51,7 +49,6 @@ class AsyncBaseHandler(BaseHandler):
             self._post_()
 
     @tornado.web.asynchronous
-    @tornado.gen.engine
     def put(self):
         if self.current_user is None:
             self.render_error(error_code=1101,msg="API调用失败,请登录")

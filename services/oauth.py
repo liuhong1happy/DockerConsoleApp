@@ -1,5 +1,6 @@
 from models.user import UserModel
-import tornado.gen
+from tornado import gen
+from tornado.concurrent import return_future
 
 class OAuthService():
     m_user = UserModel()
@@ -7,18 +8,21 @@ class OAuthService():
     def __init__(self):
         pass
       
-    @tornado.gen.engine
+    @gen.coroutine
     def update_gitlab_token(self,user_id,token=None,callback=None):
-        user = yield tornado.gen.Task(self.m_user.update,{"_id":user_id},{"$set":{"gitlab_token":token}})
-        callback(user)
+        one = yield self.m_user.find_one(user_id)
+        user = yield self.m_user.update_one({"_id":user_id},{"$set":{"gitlab_token":token}})
+        raise gen.Return(user)
     
-    @tornado.gen.engine
+    @gen.coroutine
     def get_gitlab_token(self,user_id,callback=None):
-        user = yield tornado.gen.Task(self.m_user.find_one,user_id)
+        user = yield self.m_user.find_one(user_id)
+        
         if user is None:
-            callback(None)
+            raise gen.Return(None)
         else:
-            if  hasattr(user,'gitlab_token'):
-                callback(user["gitlab_token"])
+            gitlab_token = user.get("gitlab_token",False)
+            if  gitlab_token:
+                raise gen.Return(gitlab_token)
             else:
-                callback(None)
+                raise gen.Return(None)

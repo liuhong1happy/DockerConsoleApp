@@ -16,7 +16,7 @@ class LoginHandler(tornado.web.RequestHandler):
 class SigninHandler(BaseHandler):
     s_user = UserService()
     @tornado.web.asynchronous
-    @tornado.gen.engine
+    @tornado.gen.coroutine
     def post(self):
         name_or_email = self.get_argument("name_or_email")
         password =  self.get_argument("password")
@@ -29,7 +29,7 @@ class SigninHandler(BaseHandler):
             "create_time":True,
             "password":True
         }
-        user =yield tornado.gen.Task(self.s_user.signin,name_or_email, password,fields=fields)
+        user =yield self.s_user.signin(name_or_email, password,fields=fields)
         if user is None:
             self.render_error(error_code=404,msg="login failed")
         else:
@@ -40,7 +40,7 @@ class SignupHandler(BaseHandler):
     s_user = UserService()
     
     @tornado.web.asynchronous
-    @tornado.gen.engine
+    @tornado.gen.coroutine
     def post(self):
         name = self.get_argument("name")
         email =  self.get_argument("email")
@@ -56,13 +56,13 @@ class SignupHandler(BaseHandler):
             "password":True
         }
 
-        hasName =yield tornado.gen.Task(self.s_user.find_one,{"name":name}, fields = fields)
-        hasEmail =yield  tornado.gen.Task(self.s_user.find_one,{"email":email}, fields = fields)
+        hasName =yield self.s_user.find_one({"name":name}, fields = fields)
+        hasEmail =yield  self.s_user.find_one({"email":email}, fields = fields)
 
         if( (hasName is not None) or (hasEmail is not None) ):
             self.render_error(error_code=404,msg='user exist')
         else:
-            user =yield tornado.gen.Task(self.s_user.signup,name,email, password,fields)
+            user = yield self.s_user.signup(name,email, password,fields)
             if not user:
                 self.render_error(error_code=404,msg='signup failed')
             else:
@@ -71,11 +71,11 @@ class SignupHandler(BaseHandler):
 class ForgetHandler(BaseHandler):
     s_user = UserService()
     @tornado.web.asynchronous
-    @tornado.gen.engine
+    @tornado.gen.coroutine
     def post(self):
         name = self.get_argument("email")
         # 重置密码
-        user =yield tornado.gen.Task(self.s_user.forget,email)
+        user =yield self.s_user.forget(email)
         # 发送邮件
         send_email()
 

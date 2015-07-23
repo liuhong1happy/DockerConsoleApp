@@ -1,5 +1,5 @@
 from models.service  import ServiceModel
-import tornado.gen
+from tornado import gen
 
 class ServiceService():
     m_service = ServiceModel()
@@ -7,16 +7,15 @@ class ServiceService():
     def __init__(self):
         pass
       
-    @tornado.gen.engine
+    @gen.coroutine
     def insert_service(self,service,callback=None):
-        model = yield tornado.gen.Task(self.m_service.insert_one,service)
-        callback(model)
+        model = yield self.m_service.insert_one(service)
+        raise gen.Return(model)
 
-    @tornado.gen.engine
+    @gen.coroutine
     def get_list(self,spec,fields=None,sorts=None,page_index=0,page_size=20,callback=None):
-
-        result = yield tornado.gen.Task(self.m_service.get_list,spec,fields=fields,sorts=sorts,skip=page_size*page_index,limit=page_size)
+        result = yield self.m_service.get_list(spec,fields=fields,sorts=sorts,skip=page_size*page_index,limit=page_size)
         if result==None or not isinstance(result,list):
-            callback(None)
+            raise gen.Return(None)
         else:
-            callback(result)
+            raise gen.Return(result)

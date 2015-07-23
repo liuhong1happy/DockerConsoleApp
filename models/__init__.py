@@ -1,6 +1,7 @@
 import settings
 from tornado.options import define,options
-import tornado.gen
+from tornado import gen
+from tornado.concurrent import return_future
 import tornado.web
 import pymongo
 import logging
@@ -21,7 +22,7 @@ class BaseModel():
             self.key = "_id"
         self.db_conn  = self.db_client[self.db][self.table]
 
-    @tornado.gen.engine
+    @return_future
     def get_list(self,spec,fields=None,sorts=None,skip=0,limit=20,callback=None):
         if(spec==None or not isinstance(spec,dict)):
             spec = {"del_flag":{'$exists': 'False' }}
@@ -44,7 +45,7 @@ class BaseModel():
             result.append(doc)
         callback(result)
     
-    @tornado.gen.engine
+    @return_future
     def find_one(self,spec_or_id,fields=None,callback=None):
         if(spec_or_id==None):
             callback(None)
@@ -59,8 +60,7 @@ class BaseModel():
         result = self.db_conn.find_one(filter = spec_or_id,projection = fields)
         callback(result)
     
-    
-    @tornado.gen.engine
+    @return_future
     def insert_one(self,doc,callback=None):
         create_time = int(time.time())
         if(doc==None):
@@ -73,15 +73,14 @@ class BaseModel():
         
         result = self.db_conn.insert_one(doc)
         callback(result)
-    
-    @tornado.gen.engine
-    def update(self, spec, document, upsert=False, manipulate=False,
-               safe=True, multi=True, callback=None, **kwargs):
+
+    @return_future
+    def update_one(self, spec, document, callback=None):
         update_time = int(time.time())
         if spec==None or not isinstance(spec,dict):
-            spec = {"del_flag":{"$ne":False}}
+            spec = {"del_flag":{"$ne":'False'}}
         elif isinstance(spec,dict):
-            spec["del_flag"] = {"$ne":False}
+            spec["del_flag"] = {"$ne":'False'}
         else:
             callback(None)
         if document==None or not isinstance(spec,dict):
@@ -89,14 +88,13 @@ class BaseModel():
                   "$set":{
                     "update_time":update_time
                   }
-                }
+        }
         elif isinstance(document,dict):
             set_data = document.get("$set",{})
             set_data["update_time"] = update_time
             document["$set"] = set_data
         else:
             callback(None)
-            
-        result,error = yield tornado.gen.Task(self.db_conn.update,spec,document,upsert=upsert,manipulate=manipulate, safe=safe, multi=multi,**kwargs)
+        result =self.db_conn.update_one(spec,document,upsert=False)
         callback(result)
         

@@ -3,22 +3,32 @@
 from services.oauth import OAuthService
 import tornado.web
 import tornado.gen
-import tornado.escape
-import json
-from util.rabbitmq import send_message
-from stormed import Message
 import settings
-from views import AsyncBaseHandler
+from views import BaseHandler,AsyncBaseHandler
 from util.oauth import GitLabOAuth2Mixin
 
-class GitLabOAuthHandler(AsyncBaseHandler,GitLabOAuth2Mixin):
+class GitLabOAuthHandler(BaseHandler,GitLabOAuth2Mixin):
+    s_oauth = OAuthService()
+    
     @tornado.gen.coroutine
     def get(self):
-        if self.get_argument('code', False):
-            access = yield self.get_authenticated_user(code=self.get_argument('code'))
-            user = yield self.get_user_info(access_token=access["access_token"])
-            # Save the user and access token with
-            # e.g. set_secure_cookie.
+        code = self.get_argument('code', False)
+        if code:
+            access = yield self.get_authenticated_user(code=code)
+            user_info = yield self.get_user_info(access_token=access["access_token"])
+            user_id = self.current_user["_id"]
+            user = yield self.s_oauth.update_gitlab_token(user_id,{"result_code":code,"access_token":access,"user_info":user_info})
         else:
             yield self.authorize_redirect()
 
+class GitLabTokenHandler(AsyncBaseHandler):
+    s_oauth = OAuthService()
+    @tornado.gen.coroutine
+    def _get_(self):
+        user_id = self.current_user["_id"]
+        token = yield self.s_oauth.get_gitlab_token(user_id)
+        if token is None:
+            self.render_error(error_code=404,msg="not find data")
+        else:
+            self.write_result(data=token)
+        

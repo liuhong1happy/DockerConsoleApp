@@ -10,6 +10,7 @@ from stormed import Message
 import settings
 from views import AsyncBaseHandler
 
+
 class ServiceHandler(AsyncBaseHandler):
     s_service = ServiceService()
     fields={
@@ -20,15 +21,16 @@ class ServiceHandler(AsyncBaseHandler):
         "envirements":True,
         "logo":True
     }
-    @tornado.gen.engine
+    @tornado.gen.coroutine
     def _get_(self):
         service_id = self.get_argument("id")
-        service = tornado.gen.Task(self.s_service.get_one,service_id,fields=self.fields)
+        service = yield self.s_service.get_one(service_id,fields=self.fields)
         if not service:
             self.render_error(error_code=404,msg="not data")
         else:
             self.write_result(data=service)
-    @tornado.gen.engine
+            
+    @tornado.gen.coroutine
     def _post_(self):
         git_path = self.get_argument("git_path",None)
         name = self.get_argument("service_name",None)
@@ -41,7 +43,7 @@ class ServiceHandler(AsyncBaseHandler):
         insertData["user"] = user_name
         insertData["status"] = 'created'
         
-        result= yield tornado.gen.Task(self.s_service.insert_service,insertData)
+        result= yield self.s_service.insert_service(insertData)
         
         # 加入队列
         msg = Message( json.dumps({
@@ -60,14 +62,14 @@ class ServiceHandler(AsyncBaseHandler):
             self.write_result(data=insertData)
     
 class GetServiceLogsHandler(AsyncBaseHandler):
-    @tornado.gen.engine
+    @tornado.gen.coroutine
     def _get_(self):
         service_id = self.get_argument("id")
         fields={
             "logs":True,
             "status":True
         }
-        service = tornado.gen.Task(s_service.get_one,service_id,fields=fields)
+        service = yield s_service.get_one(service_id,fields=fields)
         if not service:
             self.render_error(error_code=404,msg="not data")
         else:
@@ -86,7 +88,7 @@ class ServicesHandler(AsyncBaseHandler):
         "update_time":True,
         'create_time':True
     }
-    @tornado.gen.engine
+    @tornado.gen.coroutine
     def _get_(self):
         spec_type = self.get_argument("spec_type","name")
         spec_text =  self.get_argument("spec_text","")
@@ -94,7 +96,7 @@ class ServicesHandler(AsyncBaseHandler):
         page_size =int(self.get_argument("page_size",20))
         spec ={}
         spec[spec_type]={ '$regex' : spec_text}
-        services =yield tornado.gen.Task(self.s_service.get_list,spec,fields=self.fields,page_index=page_index,page_size=page_size)
+        services =yield self.s_service.get_list(spec,fields=self.fields,page_index=page_index,page_size=page_size)
         if not services:
             self.render_error(error_code=404,msg="not data")
         else:

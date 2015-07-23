@@ -12,8 +12,7 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken", fu
     var token = config[env].gitlab.token;
     var client_id = config[env].gitlab.client_id;
     var redirect_uri = config[env].gitlab.redirect_uri;
-    var encodeUri = $window.encodeURIComponent(redirect_uri);
-    $scope.authLink = token+ "?client_id="+client_id+"&redirect_uri="+encodeUri+"&response_type=code";
+    $scope.authLink = token+ "?client_id="+client_id+"&redirect_uri="+redirect_uri+"&response_type=code";
     GitLabToken.getToken({},function(res){
         if(res && res.status=="success"){
             if(res.data && res.data.access_token){
