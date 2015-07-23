@@ -1,4 +1,4 @@
-from tornado.auth import OAuth2Mixin
+from tornado.auth import OAuth2Mixin,_auth_return_future
 import settings
 
 class GitLabOAuth2Mixin(OAuth2Mixin):
