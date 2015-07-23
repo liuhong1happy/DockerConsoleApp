@@ -3,9 +3,9 @@ import settings
 
 class GitLabOAuth2Mixin(OAuth2Mixin):
     _OAUTH_SETTINGS_KEY = 'GITLAB_OAUTH'
-    _OAUTH_AUTHORIZE_URL = settings[self._OAUTH_SETTINGS_KEY].authorize_url
-    _OAUTH_ACCESS_TOKEN_URL = settings[self._OAUTH_SETTINGS_KEY].access_token_url
-    _OAUTH_USERINFO_URL = settings[self._OAUTH_SETTINGS_KEY].user_info_url
+    _OAUTH_AUTHORIZE_URL = settings[self._OAUTH_SETTINGS_KEY]['authorize_url']
+    _OAUTH_ACCESS_TOKEN_URL = settings[self._OAUTH_SETTINGS_KEY]['access_token_url']
+    _OAUTH_USERINFO_URL = settings[self._OAUTH_SETTINGS_KEY]['user_info_url']
     _OAUTH_NO_CALLBACKS = False
     
     @_auth_return_future
