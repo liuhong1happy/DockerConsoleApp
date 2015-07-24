@@ -4,9 +4,13 @@ import settings
 import urllib as urllib_parse
 from tornado import httpclient,escape
 import functools
+from tornado.httpclient import AsyncHTTPClient
 
 class GitLabOAuth2Mixin(OAuth2Mixin):
 
+    def __init__(self):
+        AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
+        
     _OAUTH_AUTHORIZE_URL = settings.GITLAB_OAUTH['authorize_url']
     _OAUTH_ACCESS_TOKEN_URL = settings.GITLAB_OAUTH['access_token_url']
     _OAUTH_USERINFO_URL = settings.GITLAB_OAUTH['user_info_url']
@@ -51,7 +55,25 @@ class GitLabOAuth2Mixin(OAuth2Mixin):
         }
         self.redirect(url_concat(self._OAUTH_AUTHORIZE_URL, args))
         callback()
-        
+
+    @_auth_return_future
+    def get_by_api(self, api, callback, access_token=None,post_args=None, **kwargs):
+        url = settings.GITLAB_SITE_URL+api
+        all_args = {}
+        if access_token:
+            all_args["access_token"] = access_token
+
+        if all_args:
+            url += "?" + urllib_parse.urlencode(all_args)
+        callback = functools.partial(self._on_oauth2_request, callback)
+        http = self.get_auth_http_client()
+        if post_args is not None:
+            http.fetch(url, method="POST", body=urllib_parse.urlencode(post_args),
+                       callback=callback,**kwargs)
+        else:
+            http.fetch(url, callback=callback,**kwargs)
+    
+    
     @_auth_return_future
     def get_user_info(self,callback,access_token=None,post_args=None, **args):
         url = self._OAUTH_USERINFO_URL

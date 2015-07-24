@@ -16,6 +16,10 @@ class GitLabOAuthHandler(BaseHandler,GitLabOAuth2Mixin):
         if code:
             access = yield self.get_authenticated_user(code=code)
             user_info = yield self.get_user_info(access_token=access["access_token"])
+            groups_info = yield self.get_by_api("/api/v3//groups",access_token=access["access_token"])
+            for i in range(len(groups_info)):
+                group_info = yield self.get_by_api("/api/v3/groups/"+str(groups_info[i]["id"]),access_token=access["access_token"])
+                groups_info[i]["details"] = group_info
             user_id = self.current_user["_id"]
             user = yield self.s_oauth.update_gitlab_token(user_id,{"result_code":code,"access_token":access,"user_info":user_info})
         else:
@@ -30,5 +34,6 @@ class GitLabTokenHandler(AsyncBaseHandler):
         if token is None:
             self.render_error(error_code=404,msg="not find data")
         else:
+            print token
             self.write_result(data=token)
         
