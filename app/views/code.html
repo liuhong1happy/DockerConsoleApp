@@ -11,9 +11,14 @@
                 <a ng-click="showUser(user.id)">  [[user.name]]</a>
             </li>
         </ul>
-        <ul ng-repeat="user in users" ng-show="user.active" style="border:1px solid #ddd;border-top:0px solid transparent;padding-top:10px;">
-            <li ng-repeat="project in user.projects" style="margin:0px 20px 20px;padding:20px;border:1px solid #00a28d;">
-                    [[project.name]]
+        <ul class="nav nav-pills" ng-repeat="user in users" ng-show="user.active" style="border:1px solid #ddd;border-top:0px solid transparent;padding-top:10px;">
+            <li role="presentation" ng-repeat="project in user.projects" style="margin:0px 20px 20px;padding:20px;border:1px solid #00a28d;">
+                   <div class="project-avatar">[[project.avatar_url]]</div>
+                   <div class="project-name">[[project.name]]</div> 
+                   <div class="project-url">[[project.web_url]]</div> 
+                   <div class="project-link">
+                     <a ng-click="buildProject(user.id,project.name,project.web_url)">构建镜像</a>
+                   </div>
             </li>
         </ul>
     </div>
