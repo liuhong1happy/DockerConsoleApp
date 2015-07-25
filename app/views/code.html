@@ -8,7 +8,7 @@
     <div class="tab-nav">
         <ul class="ul-nav nav nav-tabs">
             <li  role="presentation" ng-repeat="user in users" ng-class="user.active?'active':'';" ng-style="user.active?{}:{}">
-                <a ng-click="">  [[user.name]]</a>
+                <a ng-click="showUser(user.id)">  [[user.name]]</a>
             </li>
         </ul>
         <ul ng-repeat="user in users" ng-show="user.active" style="border:1px solid #ddd;border-top:0px solid transparent;padding-top:10px;">
