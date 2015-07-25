@@ -19,7 +19,7 @@ class Application(tornado.web.Application):
     def __init__(self):
         self.init_service()
         from views.home import HomeHandler
-        from views.service import ServicesHandler,ServiceHandler
+        from views.service import ServicesHandler,ServiceInfoHandler,ServiceBuildHandler
         from views.login import LoginHandler,SigninHandler,SignupHandler,ForgetHandler
         from views.oauth import GitLabOAuthHandler,GitLabTokenHandler
         handlers = [
@@ -29,7 +29,8 @@ class Application(tornado.web.Application):
              (r"/api/user/signin",SigninHandler),
              (r"/api/user/forget",ForgetHandler),
              (r"/api/services",ServicesHandler),
-             (r"/api/service",ServiceHandler),
+             (r"/api/service/info",ServiceInfoHandler),
+             (r"/api/service/build",ServiceBuildHandler),
              (r"/api/gitlab/oauth",GitLabOAuthHandler),
              (r"/api/gitlab/token",GitLabTokenHandler)
         ]
