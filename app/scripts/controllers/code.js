@@ -146,8 +146,8 @@ angularApp.factory('GitLabToken',["$resource",function($resource){
     });
 }]);
 
-angularApp.factory('ImageBuild',["$resource",function($resource){
-    return $resource('/api/image/build',{
+angularApp.factory('ServiceBuild',["$resource",function($resource){
+    return $resource('/api/service/build',{
     },{
         "build":{
             method:"POST",
@@ -156,8 +156,8 @@ angularApp.factory('ImageBuild',["$resource",function($resource){
     });
 }]);
 
-angularApp.factory('ImageInfo',["$resource",function($resource){
-    return $resource('/api/image/info',{
+angularApp.factory('ServiceInfo',["$resource",function($resource){
+    return $resource('/api/service/info',{
     },{
         "info":{
             method:"POST",
