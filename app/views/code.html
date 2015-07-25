@@ -1,10 +1,10 @@
-<div class="row" style="margin:20px 120px;">
+<div class="row" style="margin:20px 120px;" ng-show="showScope=='user'">
     <h2>代码托管</h2>
     <p>我们需要获取你gitlab代码库列表，以便实现镜像自动构建、持续集成和自动部署</p>
     <a ng-hide="hasToken" class="btn btn-success" ng-href="authLink">开启托管</a>
     <hr />
 </div>
-<div class="row" ng-show="hasToken" style="margin:20px 120px;">
+<div class="row" ng-show="hasToken && showScope=='user'" style="margin:20px 120px;">
     <div class="tab-nav">
         <ul class="ul-nav nav nav-tabs">
             <li  role="presentation" ng-repeat="user in users" ng-class="user.active?'active':'';" ng-style="user.active?{}:{}">
@@ -23,3 +23,16 @@
         </ul>
     </div>
 </div>
+
+<div  class="row" ng-show="showScope=='project'">
+    <h2>[[project.name]]</h2>
+    <p>[[project.web_url]]</p>
+    <p>[[project.build_status]]</p>
+    <hr />
+</div>
+<div class="row" ng-show="showScope=='project'">
+    <div class="build-info">
+      [[project.build_info]]
+    </div>
+</div>
+
