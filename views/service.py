@@ -10,26 +10,7 @@ from stormed import Message
 import settings
 from views import AsyncBaseHandler
 
-
-class ServiceHandler(AsyncBaseHandler):
-    s_service = ServiceService()
-    fields={
-        "name":True,
-        "user":True,
-        "image":True,
-        "ports":True,
-        "envirements":True,
-        "logo":True
-    }
-    @tornado.gen.coroutine
-    def _get_(self):
-        service_id = self.get_argument("id")
-        service = yield self.s_service.get_one(service_id,fields=self.fields)
-        if not service:
-            self.render_error(error_code=404,msg="not data")
-        else:
-            self.write_result(data=service)
-            
+class ServiceBuildHandler(AsyncBaseHandler):
     @tornado.gen.coroutine
     def _post_(self):
         git_path = self.get_argument("git_path",None)
@@ -60,23 +41,27 @@ class ServiceHandler(AsyncBaseHandler):
         else:
             insertData["_id"] = str(result)
             self.write_result(data=insertData)
-    
-class GetServiceLogsHandler(AsyncBaseHandler):
+
+class ServiceInfoHandler(AsyncBaseHandler):
+    s_service = ServiceService()
+    fields={
+        "name":True,
+        "user":True,
+        "image":True,
+        "ports":True,
+        "envirements":True,
+        "logo":True
+    }
     @tornado.gen.coroutine
     def _get_(self):
         service_id = self.get_argument("id")
-        fields={
-            "logs":True,
-            "status":True
-        }
-        service = yield s_service.get_one(service_id,fields=fields)
+        service = yield self.s_service.get_one(service_id,fields=self.fields)
         if not service:
             self.render_error(error_code=404,msg="not data")
         else:
             self.write_result(data=service)
 
 class ServicesHandler(AsyncBaseHandler):
-    
     s_service = ServiceService()
     fields={
         "name":True,
