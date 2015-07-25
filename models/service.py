@@ -5,8 +5,12 @@ class ServiceModel(BaseModel):
     db = "console"
     
     fields={
-        "name":True,
-        "user":True,
-        "code":True,
+        "project_url":True,
+        "project_name":True,
+        "project_id":True,
+        "user_id":True,
+        "status":True,
         "logs":True
+        "update_time":True,
+        'create_time':True
     }
