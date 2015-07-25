@@ -9,30 +9,35 @@ from util.rabbitmq import send_message
 from stormed import Message
 import settings
 from views import AsyncBaseHandler
+import time
 
 class ServiceBuildHandler(AsyncBaseHandler):
     @tornado.gen.coroutine
     def _post_(self):
-        git_path = self.get_argument("git_path",None)
-        name = self.get_argument("service_name",None)
-        user_name = self.current_user.get("name","admin")
-                
+        project_url = self.get_argument("project_url",None)
+        project_name = self.get_argument("project_name",None)
+        project_id = self.get_argument("project_id",None)
+        user_id = self.current_user.get("_id",None)
+        create_time = time.time()
+        
         # 数据库操作
         insertData = {}
-        insertData["code"] = git_path
-        insertData["name"] = name
-        insertData["user"] = user_name
+        insertData["project_url"] = project_url
+        insertData["project_name"] = project_name
+        insertData["project_id"] = project_id
+        insertData["user_id"] = user_id
         insertData["status"] = 'created'
-        
+        insertData["logs"] = [{"create_time":create_time,"info":"started build project:"+project_name,"user_id":user_id}]
         result= yield self.s_service.insert_service(insertData)
         
         # 加入队列
         msg = Message( json.dumps({
-            "code":git_path,
-            "name":name,
-            "user":user_name,
+            "project_url":project_url,
+            "project_name":project_name,
+            "project_id":project_id,
+            "user_id":user_id,
             "reply_to":'service_logs'
-        }) )
+        }))
         
         send_message(msg,settings.CREATE_SERVICE_EXCHANGE,settings.CREATE_SERVICE_ROUTING)
         
@@ -45,17 +50,20 @@ class ServiceBuildHandler(AsyncBaseHandler):
 class ServiceInfoHandler(AsyncBaseHandler):
     s_service = ServiceService()
     fields={
-        "name":True,
-        "user":True,
-        "image":True,
-        "ports":True,
-        "envirements":True,
-        "logo":True
+        "project_url":True,
+        "project_name":True,
+        "project_id":True,
+        "user_id":True,
+        "status":True,
+        "logs":True
     }
     @tornado.gen.coroutine
     def _get_(self):
-        service_id = self.get_argument("id")
-        service = yield self.s_service.get_one(service_id,fields=self.fields)
+        project_url = self.get_argument("project_url",None)
+        project_name = self.get_argument("project_name",None)
+        project_id = self.get_argument("project_id",None)
+        
+        service = yield self.s_service.get_one({"project_url":project_url},fields=self.fields)
         if not service:
             self.render_error(error_code=404,msg="not data")
         else:
@@ -64,18 +72,18 @@ class ServiceInfoHandler(AsyncBaseHandler):
 class ServicesHandler(AsyncBaseHandler):
     s_service = ServiceService()
     fields={
-        "name":True,
-        "user":True,
-        "image":True,
-        "code":True,
+        "project_url":True,
+        "project_name":True,
+        "project_id":True,
+        "user_id":True,
         "status":True,
-        "logs":True,
+        "logs":True
         "update_time":True,
         'create_time':True
     }
     @tornado.gen.coroutine
     def _get_(self):
-        spec_type = self.get_argument("spec_type","name")
+        spec_type = self.get_argument("spec_type","project_name")
         spec_text =  self.get_argument("spec_text","")
         page_index =int(self.get_argument("page_index",0))
         page_size =int(self.get_argument("page_size",20))
