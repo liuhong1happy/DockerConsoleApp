@@ -7,21 +7,106 @@
  * # CodeCtrl
  * Controller of the angularApp
  */
-angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken", function ($scope,config,$window,GitLabToken) {
+angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","ImageBuild","ImageInfo","$timeout", 
+  function ($scope,config,$window,GitLabToken,ImageBuild,ImageInfo,$timeout) {
     var env = config.envirement;
     var token = config[env].gitlab.token;
     var client_id = config[env].gitlab.client_id;
     var redirect_uri = config[env].gitlab.redirect_uri;
     $scope.authLink = token+ "?client_id="+client_id+"&redirect_uri="+redirect_uri+"&response_type=code";
+    $scope.showScope = "user";
     $scope.showUser = function(user_id){
       for(var u in $scope.users){
           $scope.users[u].active = false;
           if($scope.users[u].id==user_id){
             $scope.users[u].active = true;
           }
-        }
       }
     }
+    
+    var getImageInfo = function(){
+        if($scope.project==null) $timeout.cancel(getImageInfo);
+        project_name = $scope.project["name"];
+        project_url = $scope.project["web_url"];
+        ImageInfo.info({},{
+          "project_name":project_name,
+          "project_url":project_url
+        },function(res){
+          var build_status = res.data.build_status;
+          var build_info = res.data.build_info;
+          $scope.project["build_status"] = build_status;
+          $scope.project["build_info"] = build_info;
+          if(build_status=="success"){
+            $timeout.cancel(getImageInfo);
+          }
+        },function(e,err){
+          $timeout.cancel(getImageInfo);
+          $scope.project["build_status"] = "抱歉，网络原因无法得知当前状态";
+          $scope.project["build_info"] = "抱歉,网络原因无法更新日志";
+        });
+    }
+    
+    $scope.showUser = function(){
+      $scope.showScope = "user";
+      $scope.project = null;
+    }
+    
+    $scope.showProject = function(user_id,project_name,project_url){
+        $scope.project = null;
+        for(var i in $scope.users){
+          var user = $scope.users[i];
+          for(var j in user.projects){
+            var project = user.projects[j];
+            if(project.web_url==project_url){
+              $scope.project = project;
+              $scope.project["build_status"] = "查询过程中...";
+              $scope.project["build_info"] = "查询过程中..."
+              $scope.showScope = "project";
+              $timeout(getImageInfo,1000);
+              break;
+            }
+          }
+          if(user.id==user_id){
+            break;
+          }
+        }
+        if($scope.project==null){
+          alert("很抱歉，没有帮您找到项目的详细信息")
+        }
+    }
+    
+    $scope.buildProject = function(user_id,project_name,project_url){
+      // 传递信息给后端，转到项目详情页面
+      ImageBuild.build({},{
+        "project_name":project_name,
+        "project_url":project_url
+      },function(res){
+        $scope.project = null;
+        for(var i in $scope.users){
+          var user = $scope.users[i];
+          for(var j in user.projects){
+            var project = user.projects[j];
+            if(project.web_url==project_url){
+              $scope.project = project;
+              $scope.project["build_status"] = "查询过程中...";
+              $scope.project["build_info"] = "查询过程中..."
+              $scope.showScope = "project";
+              $timeout(getImageInfo,1000);
+              break;
+            }
+          }
+          if(user.id==user_id){
+            break;
+          }
+        }
+        if($scope.project==null){
+          alert("很抱歉，没有帮您找到项目的详细信息")
+        }
+      },function(e,err){
+        alert("服务器错误");
+      })
+    }
+    
     GitLabToken.getToken({},function(res){
         if(res && res.status=="success"){
             if(res.data && res.data.access_token){
@@ -36,7 +121,7 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken", fu
                     var group = groups_info[i];
                     users.push({"name":group.name,"projects":group.details.projects,"active":false});
                 }
-                 $scope.users = users; 
+                $scope.users = users; 
             }else{
                 $scope.hasToken = false; 
             }
@@ -53,6 +138,26 @@ angularApp.factory('GitLabToken',["$resource",function($resource){
     },{
         "getToken":{
             method:"GET",
+            isArray:false
+        }
+    });
+}]);
+
+angularApp.factory('ImageBuild',["$resource",function($resource){
+    return $resource('/api/image/build',{
+    },{
+        "build":{
+            method:"POST",
+            isArray:false
+        }
+    });
+}]);
+
+angularApp.factory('ImageInfo',["$resource",function($resource){
+    return $resource('/api/image/info',{
+    },{
+        "info":{
+            method:"POST",
             isArray:false
         }
     });
