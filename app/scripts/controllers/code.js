@@ -28,9 +28,11 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Im
         if($scope.project==null) $timeout.cancel(getImageInfo);
         project_name = $scope.project["name"];
         project_url = $scope.project["web_url"];
+        project_id = $scope.project["id"];
         ImageInfo.info({},{
           "project_name":project_name,
-          "project_url":project_url
+          "project_url":project_url,
+          "project_id":project_id
         },function(res){
           var build_status = res.data.build_status;
           var build_info = res.data.build_info;
@@ -51,7 +53,7 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Im
       $scope.project = null;
     }
     
-    $scope.showProject = function(user_id,project_name,project_url){
+    $scope.showProject = function(user_id,project_id,project_name,project_url){
         $scope.project = null;
         for(var i in $scope.users){
           var user = $scope.users[i];
@@ -75,11 +77,12 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Im
         }
     }
     
-    $scope.buildProject = function(user_id,project_name,project_url){
+    $scope.buildProject = function(user_id,project_id,project_name,project_url){
       // 传递信息给后端，转到项目详情页面
       ImageBuild.build({},{
         "project_name":project_name,
-        "project_url":project_url
+        "project_url":project_url,
+        "project_id":project_id
       },function(res){
         $scope.project = null;
         for(var i in $scope.users){
