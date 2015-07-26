@@ -7,10 +7,8 @@ from tornado import gen
 import tornado.httpserver
 import os.path
 import settings
-from util.db import init_db
-from util.discover import init_etcd
-from util.dockerclient import init_docker
-from util.consumer import init_amqp
+
+
 
 define("port", default=settings.TORNADO_PORT+1, help="run on the given port", type=int)
 define("ioloop",default=None,help="global ioloop instance",type=object)
@@ -36,9 +34,13 @@ class Application(tornado.web.Application):
         tornado.web.Application.__init__(self, handlers, **settings)
     
     def init_service(self):
+        from util.db import init_db
         init_db()
+        from util.discover import init_etcd
         init_etcd()
+        from util.dockerclient import init_docker
         init_docker()
+        from util.consumer import init_amqp
         init_amqp()
 
 def main():

@@ -6,6 +6,7 @@ from tornado import httpclient,escape
 import functools
 from tornado.httpclient import AsyncHTTPClient
 
+
 class GitLabOAuth2Mixin(OAuth2Mixin):
 
     def __init__(self):
@@ -38,6 +39,8 @@ class GitLabOAuth2Mixin(OAuth2Mixin):
             return
         future.set_result(escape.json_decode(response.body))
         
+        
+        
     def _on_access_token(self, future, response):
         if response.error:
             future.set_exception(AuthError('Gitlab auth error: %s' % str(response)))
@@ -57,22 +60,21 @@ class GitLabOAuth2Mixin(OAuth2Mixin):
         callback()
 
     @_auth_return_future
-    def get_by_api(self, api, callback, access_token=None,post_args=None, **kwargs):
+    def get_by_api(self, api, callback=None, access_token=None,post_args=None, **kwargs):
         url = settings.GITLAB_SITE_URL+api
         all_args = {}
         if access_token:
             all_args["access_token"] = access_token
-
         if all_args:
             url += "?" + urllib_parse.urlencode(all_args)
-        callback = functools.partial(self._on_oauth2_request, callback)
+        if callback==None:
+            callback = functools.partial(self._on_oauth2_request, callback)
         http = self.get_auth_http_client()
         if post_args is not None:
             http.fetch(url, method="POST", body=urllib_parse.urlencode(post_args),
                        callback=callback,**kwargs)
         else:
             http.fetch(url, callback=callback,**kwargs)
-    
     
     @_auth_return_future
     def get_user_info(self,callback,access_token=None,post_args=None, **args):

@@ -10,7 +10,7 @@ class ServiceModel(BaseModel):
         "project_id":True,
         "user_id":True,
         "status":True,
-        "logs":True
+        "logs":True,
         "update_time":True,
         'create_time':True
     }

@@ -9,6 +9,15 @@ import json
 import pycurl
 import StringIO
 import subprocess
+from util.oauth import GitLabOAuth2Mixin
+from services.oauth import OAuthService
+from services.service import ServiceService
+from tornado.httputil import HTTPHeaders
+from tornado import gen
+from bson.objectid import ObjectId
+import md5
+import time
+import random
 
 conn = Connection(host=settings.MQ_HOST,username=settings.MQ_USERNAME,
       password=settings.MQ_PASSWORD,heartbeat=settings.MQ_HEARTBEAT)
@@ -61,30 +70,108 @@ def send_message(message,exchange_name,routing_key):
     ch = conn.channel()
     ch.publish(msg, exchange=exchange_name, routing_key=routing_key)
     
-def build_context(code):
-    p = subprocess.Popen("curl -u 'liuhong1happy:wodexinmima96971' https://api.github.com/repos/Dockerlover/docker-ubuntu/contents", shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    for line in p.stdout.readlines():
-        print line
-    retval = p.wait()
 
+class BuildImage():
+    s_service = ServiceService()
+    def __init__(self,build_context):
+        self._build_context = build_context
+        
+    @gen.coroutine
+    def get_access_token(self,user_id):
+        s_oauth = OAuthService()
+        token = yield s_oauth.get_gitlab_token(ObjectId(user_id))
+        raise gen.Return(token)
     
-def create_images(reply_to,code,name,user):
-    cli = options.docker_client
-    # 获取上下文 (tar文件)
-    fp = open("docker-ubuntu.tar","r") 
+    # 随机生产md5加密的hash码
+    def gen_md5(self):
+        m = md5.new()  
+        project_name = self._build_context.get("project_name",None)
+        random_float = random.uniform(0, 1000)
+        current_time = time.time()
+        m.update(str(project_name)+str(random_float)+str(current_time))
+        return m.hexdigest()  
     
-    tag = settings.DOCKER_TAGPREFIX +"/"+user+"/"+name
-    for line in cli.build(fileobj=fp, rm=True, tag=tag,custom_context=True):
-        print line
-
-    for line in cli.push( tag, stream=True,insecure_registry= settings.DOCKER_REGISTRY):
-        print line
+    # 获取代码并构建上下文
+    @gen.coroutine
+    def start_build_context(self):
+        # 随机生产文件名称，并删除可能存在的文件
+        project_name = self._build_context.get("project_name",None)
+        self._md5 = self.gen_md5()
+        self._file_name = "/tmp/build_image/"+project_name+"-"+self._md5+".tar"
+        self.delete_tar_file(self._file_name)
+        # 获取当前项目下的构建日志
+        project_url = self._build_context.get("project_url",None)
+        service = yield self.s_service.find_one({"project_url":project_url},fields=None)
+        logs = service["logs"]
+        if logs is None:
+            logs = []
+        if not isinstance(logs,list):
+            logs = []
+        self._build_context["logs"] = logs
+        self.update_database("running")
+        # 获取当前用户下的access_token
+        user_id = self._build_context.get("user_id",None)
+        token = yield self.get_access_token(user_id)
+        self._access_token = token["access_token"]["access_token"]
+        # 根据project_id组建获取master分支附件的url
+        project_id = self._build_context.get("project_id",None)
+        self._archive_url = '/api/v3/projects/'+project_id+'/repository/archive'
+        # 记录操作日志
+        self._build_context["logs"].append({"info":u"保存项目master分支附件到指定路径："+self._file_name,"user_id":user_id,"create_time":time.time()})
+        self._build_context["logs"].append({"info":u"获取当前用户下的access_token："+self._access_token,"user_id":user_id,"create_time":time.time()})
+        self._build_context["logs"].append({"info":u"根据project_id组建获取master分支附件的url："+self._archive_url ,"user_id":user_id,"create_time":time.time()})
+        self._build_context["logs"].append({"info":u"开始从"+self._archive_url+"获取master分支附件" ,"user_id":user_id,"create_time":time.time()})
+        self.update_database("running")
+        # 开始获取代码并开始构建
+        oauth_access = GitLabOAuth2Mixin()
+        headers = HTTPHeaders({"Content-Type": "application/octet-stream","Content-Transfer-Encoding":"binary"})
+        oauth_access.get_by_api(self._archive_url ,access_token=self._access_token,
+                                streaming_callback=self.save_tar_file
+                                ,headers=headers,
+                                callback=self.build_image)
+        
+        
+    # 预判文件是否存在，如果存在则删除 
+    def delete_tar_file(self,file_name):
+        import os
+        if os.path.exists(file_name):
+            os.remove(file_name)
+            
+    # 保存代码到文件系统
+    def save_tar_file(self,blob):
+        self._build_context["logs"].append({"info":u"从"+self._archive_url+"获取大小"+len(blob)+"的附件数据" ,"user_id":user_id,"create_time":time.time()})
+        WriteFileData = open(self._file_name,'ab')
+        WriteFileData.write(blob)
+        WriteFileData.close()
+        self.update_database("running")
+    
+    # 根据上下文构建
+    def build_image(self):
+        self._build_context["logs"].append({"info":u"获取附件完成，开始构建镜像" ,"user_id":user_id,"create_time":time.time()})
+        cli = options.docker_client
+        fp = open(self._file_name,"r")
+        tag = settings.DOCKER_TAGPREFIX +"/"+user+"/"+name
+        for line in cli.build(fileobj=fp, rm=True, tag=tag,custom_context=True):
+            # 写入数据库
+            self._build_context["logs"].append({"info":line ,"user_id":user_id,"create_time":time.time()})
+            self.update_database("running")
+        fp.close()
+        self.delete_tar_file(self._file_name)
+        self._build_context["logs"].append({"info":u"构建镜像完成，开始push镜像" ,"user_id":user_id,"create_time":time.time()})
+        for line in cli.push( tag, stream=True,insecure_registry= settings.DOCKER_REGISTRY):
+            # 写入数据库
+            self._build_context["logs"].append({"info":line ,"user_id":user_id,"create_time":time.time()})
+            self.update_database("running")
+        self.update_database("success")
+        
+    # 更新数据库
+    @gen.coroutine
+    def update_database(self,status):
+        self._build_context["status"] = status
+        result = yield self.s_service.insert_service(self._build_context)
     
 def create_service(msg):
-    loadedData = json.loads(msg.body)
-    reply_to = loadedData.get('reply_to')
-    code = loadedData.get("code",None)
-    name = loadedData.get("name",None)
-    user = loadedData.get("user","admin")
-    create_images(reply_to,code,name,user)
+    build_context = json.loads(msg.body)
+    builder = BuildImage(build_context)
+    builder.start_build_context()
     msg.ack()

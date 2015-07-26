@@ -72,14 +72,14 @@ angularApp.factory("config",function(){
         envirement:"dev",
         dev:{
             hrefs:{
-                book:"http://192.168.0.103:4000",
-                code:"http://192.168.0.103:10080",
-                test:"http://192.168.0.103:10081",
+                book:"http://192.168.0.110:4000",
+                code:"http://192.168.0.110:10080",
+                test:"http://192.168.0.110:10081",
             },
             gitlab:{
-                token:"http://192.168.0.103:10080/oauth/authorize",
+                token:"http://192.168.0.110:10080/oauth/authorize",
                 client_id:"9c7a33a2ed9dbe2ef77d91f9fd9c27de495ad8a68ae0609556401b09f7245d98",
-                redirect_uri:"http://192.168.0.103:8888/api/gitlab/oauth",
+                redirect_uri:"http://192.168.0.110:8888/api/gitlab/oauth",
             }
         },
         pro:{

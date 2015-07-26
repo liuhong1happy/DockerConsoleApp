@@ -12,14 +12,15 @@ from views import AsyncBaseHandler
 import time
 
 class ServiceBuildHandler(AsyncBaseHandler):
+    s_service = ServiceService()
     @tornado.gen.coroutine
     def _post_(self):
         project_url = self.get_argument("project_url",None)
         project_name = self.get_argument("project_name",None)
         project_id = self.get_argument("project_id",None)
-        user_id = self.current_user.get("_id",None)
+        user_id = str(self.current_user.get("_id",None))
         create_time = time.time()
-        
+
         # 数据库操作
         insertData = {}
         insertData["project_url"] = project_url
@@ -29,7 +30,6 @@ class ServiceBuildHandler(AsyncBaseHandler):
         insertData["status"] = 'created'
         insertData["logs"] = [{"create_time":create_time,"info":"started build project:"+project_name,"user_id":user_id}]
         result= yield self.s_service.insert_service(insertData)
-        
         # 加入队列
         msg = Message( json.dumps({
             "project_url":project_url,
@@ -38,10 +38,8 @@ class ServiceBuildHandler(AsyncBaseHandler):
             "user_id":user_id,
             "reply_to":'service_logs'
         }))
-        
         send_message(msg,settings.CREATE_SERVICE_EXCHANGE,settings.CREATE_SERVICE_ROUTING)
-        
-        if not result:
+        if result is None:
             self.render_error(error_code=404,msg="not data")
         else:
             insertData["_id"] = str(result)
@@ -58,13 +56,14 @@ class ServiceInfoHandler(AsyncBaseHandler):
         "logs":True
     }
     @tornado.gen.coroutine
-    def _get_(self):
+    def _post_(self):
         project_url = self.get_argument("project_url",None)
         project_name = self.get_argument("project_name",None)
         project_id = self.get_argument("project_id",None)
         
-        service = yield self.s_service.get_one({"project_url":project_url},fields=self.fields)
-        if not service:
+        service = yield self.s_service.find_one({"project_url":project_url},fields=self.fields)
+        service["_id"] = str(service["_id"])
+        if service is None:
             self.render_error(error_code=404,msg="not data")
         else:
             self.write_result(data=service)
@@ -77,7 +76,7 @@ class ServicesHandler(AsyncBaseHandler):
         "project_id":True,
         "user_id":True,
         "status":True,
-        "logs":True
+        "logs":True,
         "update_time":True,
         'create_time':True
     }

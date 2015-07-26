@@ -8,7 +8,7 @@
     <div class="tab-nav">
         <ul class="ul-nav nav nav-tabs">
             <li  role="presentation" ng-repeat="user in users" ng-class="user.active?'active':'';" ng-style="user.active?{}:{}">
-                <a ng-click="showUser(user.id)">  [[user.name]]</a>
+                <a ng-click="activeUser(user.id)">  [[user.name]]</a>
             </li>
         </ul>
         <ul class="nav nav-pills" ng-repeat="user in users" ng-show="user.active" style="border:1px solid #ddd;border-top:0px solid transparent;padding-top:10px;">
@@ -17,7 +17,7 @@
                    <div class="project-name">[[project.name]]</div> 
                    <div class="project-url">[[project.web_url]]</div> 
                    <div class="project-link">
-                     <a ng-click="buildProject(user.id,project.name,project.web_url)">构建镜像</a>
+                     <a ng-click="buildProject(user.id,project.id,project.name,project.web_url)">构建镜像</a>
                    </div>
             </li>
         </ul>
@@ -36,4 +36,3 @@
       [[project.build_info]]
     </div>
 </div>
-

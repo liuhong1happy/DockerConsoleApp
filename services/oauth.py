@@ -2,6 +2,7 @@ from models.user import UserModel
 from tornado import gen
 from tornado.concurrent import return_future
 
+
 class OAuthService():
     m_user = UserModel()
     
