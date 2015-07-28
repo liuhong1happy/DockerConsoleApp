@@ -12,6 +12,7 @@ import subprocess
 from util.oauth import GitLabOAuth2Mixin
 from services.oauth import OAuthService
 from services.service import ServiceService
+from services.application import ApplicationService
 from tornado.httputil import HTTPHeaders
 from tornado import gen
 from bson.objectid import ObjectId
@@ -42,16 +43,25 @@ def on_connect():
 
 def init_queue():
     ch = conn.channel()
+    
     ch.exchange_declare(exchange= settings.CREATE_SERVICE_EXCHANGE , type='direct',durable=True)
     ch.queue_declare(queue=settings.CREATE_SERVICE_QUEUE,durable=True)
     ch.queue_bind(queue=settings.CREATE_SERVICE_QUEUE,
                   exchange=settings.CREATE_SERVICE_EXCHANGE,
                   routing_key=settings.CREATE_SERVICE_ROUTING)
+
+    ch.exchange_declare(exchange= settings.RUN_APPLICATION_EXCHANGE , type='direct',durable=True)
+    ch.queue_declare(queue=settings.RUN_APPLICATION_QUEUE,durable=True)
+    ch.queue_bind(queue=settings.RUN_APPLICATION_QUEUE,
+                  exchange=settings.RUN_APPLICATION_EXCHANGE,
+                  routing_key=settings.RUN_APPLICATION_ROUTING)
+
     logging.info("Declare amqp queue and exchange")
     
 def init_consumer():
     ch = conn.channel()
     ch.consume(settings.CREATE_SERVICE_QUEUE,create_service,no_ack=False)
+    ch.consume(settings.RUN_APPLICATION_QUEUE,run_application,no_ack=False)
     logging.info("Init amqp consumer success")
 
 def init_amqp():
@@ -73,6 +83,12 @@ def create_service(msg):
     build_context = json.loads(msg.body)
     builder = BuildImage(build_context)
     builder.start_build_context()
+    msg.ack()
+
+def run_application(msg):
+    start_context = json.loads(msg.body)
+    builder = StartContainer(start_context)
+    builder.start_run_application()
     msg.ack()
 
 class BuildImage():
@@ -174,3 +190,7 @@ class BuildImage():
         self._build_context["status"] = status
         result = yield self.s_service.insert_service(self._build_context)
 
+class StartContainer():
+    s_application = ApplicationService()
+    def __init__(self,start_context):
+        self._start_context = start_context
