@@ -43,6 +43,10 @@ CREATE_SERVICE_EXCHANGE = 'create_service_exchange'
 CREATE_SERVICE_QUEUE = 'create_service_queue'
 CREATE_SERVICE_ROUTING = 'create_service_routing'
 
+RUN_APPLICATION_EXCHANGE = 'run_application_exchange'
+RUN_APPLICATION_QUEUE = 'run_application_queue'
+RUN_APPLICATION_ROUTING = 'run_application_routing'
+
 # gitlab settings
 GITLAB_SITE_URL = 'http://192.168.0.110:10080'
 GITLAB_OAUTH = {
