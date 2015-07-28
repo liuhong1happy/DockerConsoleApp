@@ -56,8 +56,7 @@ def init_consumer():
 
 def init_amqp():
     def handle_error(conn_error):
-            print conn_error.method
-            print conn_error.reply_code
+            logging.error("Init amqp error")
     conn.on_error = handle_error
     
     def handle_disconnect():
@@ -69,7 +68,12 @@ def init_amqp():
 def send_message(message,exchange_name,routing_key):
     ch = conn.channel()
     ch.publish(msg, exchange=exchange_name, routing_key=routing_key)
-    
+
+def create_service(msg):
+    build_context = json.loads(msg.body)
+    builder = BuildImage(build_context)
+    builder.start_build_context()
+    msg.ack()
 
 class BuildImage():
     s_service = ServiceService()
@@ -169,9 +173,4 @@ class BuildImage():
     def update_database(self,status):
         self._build_context["status"] = status
         result = yield self.s_service.insert_service(self._build_context)
-    
-def create_service(msg):
-    build_context = json.loads(msg.body)
-    builder = BuildImage(build_context)
-    builder.start_build_context()
-    msg.ack()
+
