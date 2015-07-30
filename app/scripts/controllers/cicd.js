@@ -13,8 +13,18 @@ angularApp.controller('CicdCtrl', ["$scope","config","Services","Service","$wind
     $scope.services = [];
     $scope.showList  = ["list","form","info"]
     $scope.showScope = $scope.showList[0];
-    $scope.service_name = "";
-    $scope.git_path = "";
+    $scope.application_name = "";
+    $scope.project_url = "";
+    $scope.project_name = "";
+    
+    $scope.create_application = function(service_id){
+      var search_services = $scope.services.filter(function(elem,pos){
+        return elem._id==service_id;
+      });
+      if(search_services.length>0){
+        
+      }
+    }
     
     $timeout(function () {
             Services.read({
