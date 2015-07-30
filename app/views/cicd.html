@@ -1,7 +1,6 @@
 <div class="row" style="margin:20px 120px;">
     <h2>代码构建</h2>
     <p>我们需要自动化去部署代码，必然会面临代码构建成容器镜像，本步骤即为构建镜像</p>
-    <a class="btn btn-success" ng-click="showScope='form'">创建任务</a>
     <hr />
 </div>
 <div class="row" ng-Show="showScope=='list'"   style="margin:20px 120px;">
@@ -13,6 +12,7 @@
                 <td>构建状态</td>
                 <td>镜像名称</td>
                 <td>更新时间</td>
+                <td>操作</td>
             </tr>
         </thead>
         <tbody>
@@ -22,6 +22,7 @@
                 <td>[[service.status]]</td>
                 <td>[[service.project_name]]</td>
                 <td>[[(service.update_time?service.update_time:service.create_time)*1000 | date:"yyyy-MM-dd hh:mm:ss"]]</td>
+                <td><a class="btn btn-success" ng-click="create_application(service._id)">创建任务</a></td>
             </tr>
         </tbody>
     </table>
