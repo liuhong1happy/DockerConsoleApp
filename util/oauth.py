@@ -67,6 +67,7 @@ class GitLabOAuth2Mixin(OAuth2Mixin):
             all_args["access_token"] = access_token
         if all_args:
             url += "?" + urllib_parse.urlencode(all_args)
+        
         if callback==None:
             callback = functools.partial(self._on_oauth2_request, callback)
         http = self.get_auth_http_client()

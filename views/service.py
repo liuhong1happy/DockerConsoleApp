@@ -19,6 +19,7 @@ class ServiceBuildHandler(AsyncBaseHandler):
         project_name = self.get_argument("project_name",None)
         project_id = self.get_argument("project_id",None)
         user_id = str(self.current_user.get("_id",None))
+        user_name = str(self.current_user.get("name",None))
         create_time = time.time()
 
         # 数据库操作
@@ -36,6 +37,7 @@ class ServiceBuildHandler(AsyncBaseHandler):
             "project_name":project_name,
             "project_id":project_id,
             "user_id":user_id,
+            "user_name":user_name,
             "reply_to":'service_logs'
         }))
         send_message(msg,settings.CREATE_SERVICE_EXCHANGE,settings.CREATE_SERVICE_ROUTING)
