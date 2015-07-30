@@ -17,11 +17,11 @@
         </thead>
         <tbody>
             <tr ng-repeat="service in services">
-                <td>[[service.name]]</td>
-                <td>[[service.code]]</td>
+                <td>[[service.project_name]]</td>
+                <td>[[service.project_url]]</td>
                 <td>[[service.status]]</td>
-                <td>[[service.image]]</td>
-                <td>[[ (service.update_time?service.update_time:service.create_time)*1000 | date:"yyyy-MM-dd hh:mm:ss"]]</td>
+                <td>[[service.project_name]]</td>
+                <td>[[(service.update_time?service.update_time:service.create_time)*1000 | date:"yyyy-MM-dd hh:mm:ss"]]</td>
             </tr>
         </tbody>
     </table>
@@ -29,18 +29,21 @@
 <div class="row" ng-Show="showScope=='form'"   style="margin:20px 120px;">
 <form role="form" name="service_form" class="form-horizontal" ng-submit="submitForm(service_form.$valid)"  novalidate> 
     <div class="form-group has-feedback">
-        <label class="col-xs-2">任务名称</label>
+        <label class="col-xs-2">应用名称</label>
         <div class="col-xs-10"> 
-            <input type="text" class="form-control"  name="service_name" ng-model="service_name" required  ng-maxlength="20"/>
-            <span class="glyphicon glyphicon-ok form-control-feedback" ng-show="service_form.service_name.$dirty && service_form.service_name.$valid"></span>
+            <input type="text" class="form-control"  name="application_name" ng-model="application_name" required  ng-maxlength="20"/>
+            <span class="glyphicon glyphicon-ok form-control-feedback" ng-show="service_form.application_name.$dirty && service_form.application_name.$valid"></span>
         </div>
     </div>
     <div class="form-group has-feedback">
-        <label  class="col-xs-2">代码位置</label>
+        <label  class="col-xs-2">镜像名称</label>
         <div  class="col-xs-10">
-            <input type="text" class="form-control"  name="git_path"  ng-model="git_path" required  ng-maxlength="200"/>
-            <span class="glyphicon glyphicon-ok form-control-feedback" ng-show="service_form.git_path.$dirty && service_form.git_path.$valid"></span>
+            <input type="text" class="form-control"  name="project_name"  ng-model="project_name" required  ng-maxlength="200"/>
+            <span class="glyphicon glyphicon-ok form-control-feedback" ng-show="service_form.project_name.$dirty && service_form.project_name.$valid"></span>
         </div>
+    </div>
+    <div class="form-group">
+      <input type="text" class="form-control" name="project_url" ng-model="project" style="display:none;"/>
     </div>
     <div class="form-group has-feedback">
         <input class="btn btn-success" type="submit" ng-disabled="service_form.$invalid" value="提交"/>
