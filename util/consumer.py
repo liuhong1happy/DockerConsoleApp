@@ -122,6 +122,7 @@ class BuildImage():
         # 获取当前项目下的构建日志
         project_url = self._build_context.get("project_url",None)
         service = yield self.s_service.find_one({"project_url":project_url},fields=None)
+        print service
         logs = service["logs"]
         if logs is None:
             logs = []
@@ -136,11 +137,12 @@ class BuildImage():
         # 根据project_id组建获取master分支附件的url
         project_id = self._build_context.get("project_id",None)
         self._archive_url = '/api/v3/projects/'+project_id+'/repository/archive'
+        print self._archive_url
         # 记录操作日志
-        self._build_context["logs"].append({"info":u"保存项目master分支附件到指定路径："+self._file_name,"user_id":user_id,"create_time":time.time()})
-        self._build_context["logs"].append({"info":u"获取当前用户下的access_token："+self._access_token,"user_id":user_id,"create_time":time.time()})
-        self._build_context["logs"].append({"info":u"根据project_id组建获取master分支附件的url："+self._archive_url ,"user_id":user_id,"create_time":time.time()})
-        self._build_context["logs"].append({"info":u"开始从"+self._archive_url+"获取master分支附件" ,"user_id":user_id,"create_time":time.time()})
+        self._build_context["logs"].append({"info":"保存项目master分支附件到指定路径："+self._file_name,"user_id":user_id,"create_time":time.time()})
+        self._build_context["logs"].append({"info":"获取当前用户下的access_token："+self._access_token,"user_id":user_id,"create_time":time.time()})
+        self._build_context["logs"].append({"info":"根据project_id组建获取master分支附件的url："+self._archive_url ,"user_id":user_id,"create_time":time.time()})
+        self._build_context["logs"].append({"info":"开始从"+self._archive_url+"获取master分支附件" ,"user_id":user_id,"create_time":time.time()})
         self.update_database("running")
         # 开始获取代码并开始构建
         oauth_access = GitLabOAuth2Mixin()
@@ -159,7 +161,8 @@ class BuildImage():
             
     # 保存代码到文件系统
     def save_tar_file(self,blob):
-        self._build_context["logs"].append({"info":u"从"+self._archive_url+"获取大小"+len(blob)+"的附件数据" ,"user_id":user_id,"create_time":time.time()})
+        print self._file_name
+        self._build_context["logs"].append({"info": "从"+self._archive_url+"获取大小"+len(blob)+"的附件数据" ,"user_id":user_id,"create_time":time.time()})
         WriteFileData = open(self._file_name,'ab')
         WriteFileData.write(blob)
         WriteFileData.close()
@@ -167,7 +170,7 @@ class BuildImage():
     
     # 根据上下文构建
     def build_image(self):
-        self._build_context["logs"].append({"info":u"获取附件完成，开始构建镜像" ,"user_id":user_id,"create_time":time.time()})
+        self._build_context["logs"].append({"info":"获取附件完成，开始构建镜像" ,"user_id":user_id,"create_time":time.time()})
         cli = options.docker_client
         fp = open(self._file_name,"r")
         tag = settings.DOCKER_TAGPREFIX +"/"+user+"/"+name
@@ -177,7 +180,7 @@ class BuildImage():
             self.update_database("running")
         fp.close()
         self.delete_tar_file(self._file_name)
-        self._build_context["logs"].append({"info":u"构建镜像完成，开始push镜像" ,"user_id":user_id,"create_time":time.time()})
+        self._build_context["logs"].append({"info":"构建镜像完成，开始push镜像" ,"user_id":user_id,"create_time":time.time()})
         for line in cli.push( tag, stream=True,insecure_registry= settings.DOCKER_REGISTRY):
             # 写入数据库
             self._build_context["logs"].append({"info":line ,"user_id":user_id,"create_time":time.time()})

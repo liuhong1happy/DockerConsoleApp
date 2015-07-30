@@ -1,5 +1,5 @@
 from models import BaseModel
 
 class ApplicationModel(BaseModel):
-    table = "applications",
+    table = "applications"
     db = "console"

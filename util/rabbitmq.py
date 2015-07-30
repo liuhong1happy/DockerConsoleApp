@@ -31,6 +31,12 @@ def init_queue():
     ch.queue_bind(queue=settings.CREATE_SERVICE_QUEUE,
                   exchange=settings.CREATE_SERVICE_EXCHANGE,
                   routing_key=settings.CREATE_SERVICE_ROUTING)
+    ch.exchange_declare(exchange= settings.RUN_APPLICATION_EXCHANGE , type='direct',durable=True)
+    ch.queue_declare(queue=settings.RUN_APPLICATION_QUEUE,durable=True)
+    ch.queue_bind(queue=settings.RUN_APPLICATION_QUEUE,
+                  exchange=settings.RUN_APPLICATION_EXCHANGE,
+                  routing_key=settings.RUN_APPLICATION_ROUTING)
+    
     logging.info("Declare amqp queue and exchange")
 
 def init_amqp():

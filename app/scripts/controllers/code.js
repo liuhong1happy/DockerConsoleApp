@@ -7,8 +7,8 @@
  * # CodeCtrl
  * Controller of the angularApp
  */
-angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","ServiceBuild","ServiceInfo","$timeout", 
-  function ($scope,config,$window,GitLabToken,ServiceBuild,ServiceInfo,$timeout) {
+angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","ServiceBuild","ServiceInfo","$interval", 
+  function ($scope,config,$window,GitLabToken,ServiceBuild,ServiceInfo,$interval) {
     var env = config.envirement;
     var token = config[env].gitlab.token;
     var client_id = config[env].gitlab.client_id;
@@ -26,12 +26,11 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Se
     }
     
     var getImageInfo = function(){
-        if($scope.project==null) $timeout.cancel(getImageInfo);
+        if($scope.project==null) $interval.cancel(getImageInfo);
         
         var project_name = $scope.project["name"];
         var project_url = $scope.project["web_url"];
-        var project_id = $scope.project["id"];
-        
+        var project_id = $scope.project["id"];        
         ServiceInfo.info(null,$.param({
           "project_name":project_name,
           "project_url":project_url,
@@ -42,10 +41,10 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Se
           $scope.project["build_status"] = build_status;
           $scope.project["build_info"] = build_info;
           if(build_status=="success"){
-            $timeout.cancel(getImageInfo);
+            $interval.cancel(getImageInfo);
           }
         },function(e,err){
-          $timeout.cancel(getImageInfo);
+          $interval.cancel(getImageInfo);
           $scope.project["build_status"] = "抱歉，网络原因无法得知当前状态";
           $scope.project["build_info"] = "抱歉,网络原因无法更新日志";
         });
@@ -67,7 +66,7 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Se
               $scope.project["build_status"] = "查询过程中...";
               $scope.project["build_info"] = "查询过程中..."
               $scope.showScope = "project";
-              $timeout(getImageInfo,1000);
+              $interval(getImageInfo,1000);
               break;
             }
           }
@@ -97,7 +96,7 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Se
               $scope.project["build_status"] = "查询过程中...";
               $scope.project["build_info"] = "查询过程中..."
               $scope.showScope = "project";
-              $timeout(getImageInfo,1000);
+              $interval(getImageInfo,1000);
               break;
             }
           }

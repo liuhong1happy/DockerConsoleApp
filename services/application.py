@@ -1,4 +1,4 @@
-from models.container import ApplicationModel
+from models.application import ApplicationModel
 import tornado.gen
 
 class ApplicationService():
