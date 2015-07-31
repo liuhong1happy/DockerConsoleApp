@@ -177,7 +177,7 @@ class BuildImage():
         cli = options.docker_client
         fp = open(self._file_name,"r")
         tag = settings.DOCKER_TAGPREFIX +"/"+self._user_name+"/"+project_name
-        for line in cli.build(fileobj=fp, rm=True, tag=tag,custom_context=True,dockerfile=project_name+"/"):
+        for line in cli.build(fileobj=fp, rm=True, tag=tag,custom_context=True,forcerm=True,dockerfile=project_name+"/"):
             # 写入数据库
             self._build_context["logs"].append({"info":line ,"user_id":self._user_id,"create_time":time.time()})
             self.update_database("running")
