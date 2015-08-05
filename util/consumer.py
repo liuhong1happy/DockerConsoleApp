@@ -114,6 +114,21 @@ class BuildImage():
         m.update(str(project_name)+str(random_float)+str(current_time))
         return m.hexdigest()  
     
+    def get_tar_file(self,arcpath,tar_file,content_path):
+        new_tar_file = tar_file+".gz";
+        t = tarfile.open(tar_file)
+        t.extractall(path = arcpath) 
+        t.close()
+        self.delete_tar_file(tar_file)
+        tz = tarfile.open(new_tar_file, "w:gz")
+        for root, dir, files in os.walk(content_path):
+            for file in files:
+                fullpath = os.path.join(root, file)
+            print fullpath
+                tz.add(fullpath,arcname=file)
+        tz.close()
+        return new_tar_file
+    
     # 获取代码并构建上下文
     @gen.coroutine
     def start_build_context(self):
@@ -173,11 +188,12 @@ class BuildImage():
         if response.error:
             return
         project_name = self._build_context.get("project_name",None)
+        self._file_name = self.get_tar_file("/tmp/build_image/"+project_name+"-"+self._md5,"/tmp/build_image/"+project_name+"-"+self._md5+".tar",project_name+".git")
         self._build_context["logs"].append({"info":u"获取附件完成，开始构建镜像" ,"user_id":self._user_id,"create_time":time.time()})
         cli = options.docker_client
         fp = open(self._file_name,"r")
         tag = settings.DOCKER_TAGPREFIX +"/"+self._user_name+"/"+project_name
-        for line in cli.build(fileobj=fp, rm=True, tag=tag,custom_context=True,forcerm=True,dockerfile=project_name+"/"):
+        for line in cli.build(fileobj=fp, rm=True, tag=tag,custom_context=True,forcerm=True):
             # 写入数据库
             self._build_context["logs"].append({"info":line ,"user_id":self._user_id,"create_time":time.time()})
             self.update_database("running")

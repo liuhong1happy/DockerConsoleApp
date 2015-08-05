@@ -33,6 +33,10 @@
 </div>
 <div class="row" ng-show="showScope=='project'">
     <div class="build-info">
-      [[project.build_info]]
+        <ul>
+            <li ng-repeat="info in project.build_info">
+                <p>[[info.info]]</p>
+            </li>
+        </ul>
     </div>
 </div>
