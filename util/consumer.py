@@ -226,7 +226,11 @@ class StartContainer():
         self._project_name = self._start_context["project_name"]
         self._user_name =  self._start_context["user_name"]
         self._app_prefix = self._user_name+"-"+self._project_name+"-"
-        
+    
+    def start_run_application(self):
+        self.pull_image()
+        self.start_container()
+    
     def pull_image(self):
         cli = options.docker_client
         self._start_context["logs"].append({"info":"starting pull image:"+self._storage_path ,"user_id":self._user_id,"create_time":time.time()})
