@@ -32,6 +32,7 @@ class GitLabOAuth2Mixin(OAuth2Mixin):
         http.fetch(self._OAUTH_ACCESS_TOKEN_URL,
                    functools.partial(self._on_access_token, callback),
                    method="POST", headers={'Content-Type': 'application/x-www-form-urlencoded'}, body=body)
+        
     def _on_oauth2_request(self, future, response):
         if response.error:
             future.set_exception(AuthError("Error response %s fetching %s" %
@@ -68,14 +69,11 @@ class GitLabOAuth2Mixin(OAuth2Mixin):
         if all_args:
             url += "?" + urllib_parse.urlencode(all_args)
         
-        if callback==None:
-            callback = functools.partial(self._on_oauth2_request, callback)
         http = self.get_auth_http_client()
         if post_args is not None:
-            http.fetch(url, method="POST", body=urllib_parse.urlencode(post_args),
-                       callback=callback,**kwargs)
+            http.fetch(url,functools.partial(self._on_oauth2_request, callback), method="POST", body=urllib_parse.urlencode(post_args),**kwargs)
         else:
-            http.fetch(url, callback=callback,**kwargs)
+            http.fetch(url, functools.partial(self._on_oauth2_request, callback),**kwargs)
     
     @_auth_return_future
     def get_user_info(self,callback,access_token=None,post_args=None, **args):

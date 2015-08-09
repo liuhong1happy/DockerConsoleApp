@@ -76,6 +76,7 @@ class ServicesHandler(AsyncBaseHandler):
         "project_url":True,
         "project_name":True,
         "project_id":True,
+        "storage_path":True,
         "user_id":True,
         "status":True,
         "logs":True,

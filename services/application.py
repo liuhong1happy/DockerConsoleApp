@@ -6,8 +6,17 @@ class ApplicationService():
     
     @tornado.gen.coroutine
     def insert_application(self,application,callback=None):
-        model = self.m_application.insert(application)
-        raise tornado.gen.Return(model)
+        app_name = application.get("app_name",None)
+        if app_name is None:
+            raise gen.Return(None)
+        app = yield self.m_application.find_one({"app_name":app_name})
+        model = {}
+        if app is None:
+            model = yield self.m_application.insert_one(app)
+            app = yield self.m_application.find_one(model.inserted_id)
+        else:
+            model = yield self.m_application.update_one({"app_name":app_name},{"$set":app})
+        raise tornado.gen.Return(app)
     
     @tornado.gen.coroutine
     def exist_application(self,project_url,callback=None):

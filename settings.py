@@ -18,22 +18,27 @@ SITE_URL = 'http://192.168.0.110:8888'
 TORNADO_PORT = 8888
 
 MONGO_POOL_ID = "DockerConsoleApp"
-MONGO_HOST = '192.168.0.110'
+MONGO_HOST = 'localhost'
 MONGO_PORT = 27017
 MONGO_DB = 'admin'
 MONGO_USER = 'mongo'
 MONGO_PWD = '123456'
 
-ETCD_HOST = '192.168.0.110'
+ETCD_HOST = 'localhost'
 ETCD_PORT = 4001
 
+# discover host
+DISCOVER_HOST = '192.168.0.110'
+# docker host
 DOCKER_HOST = 'unix:///var/run/docker.sock'
 # docker registry 
 DOCKER_REGISTRY = "http://192.168.0.110:5000"
 # docker pull tag prefix (don't have string 'http://')
 DOCKER_TAGPREFIX = "192.168.0.110:5000"
+# docker start container
+CURRENT_HOST = '192.168.0.110'
 
-MQ_HOST = '192.168.0.110'
+MQ_HOST = 'localhost'
 MQ_HEARTBEAT = 30
 MQ_USERNAME = 'admin'
 MQ_PASSWORD = 'testpass'
@@ -48,17 +53,17 @@ RUN_APPLICATION_QUEUE = 'run_application_queue'
 RUN_APPLICATION_ROUTING = 'run_application_routing'
 
 # gitlab settings
-GITLAB_SITE_URL = 'http://192.168.0.110:10080'
+GITLAB_SITE_URL = 'http://localhost:10080'
 GITLAB_OAUTH = {
     "authorize_url":GITLAB_SITE_URL+"/oauth/authorize",
     "access_token_url":GITLAB_SITE_URL+"/oauth/token",
     "user_info_url":GITLAB_SITE_URL+"/api/v3/user",
     "redirect_url":SITE_URL+'/api/gitlab/oauth',
-    "key":'9c7a33a2ed9dbe2ef77d91f9fd9c27de495ad8a68ae0609556401b09f7245d98',
-    "secret":'2b389ac2adb9a296981bc150aac272bc053f9f2ff3f8a8e79dba444240e4aabf'
+    "key":'01841bc629e150c25d3eddffc23edc4092f86aad0c1d58fef67305a125ee2b90',
+    "secret":'f70eb438801347570f7242fa9cbf53f83fc9ec9fa7888a4f9eb8a4f22e7bb8d4'
 }
 
 # redis 
-REDIS_HOST = '192.168.0.110'
+REDIS_HOST = 'localhost'
 REDIS_PORT = '6379'
 REDIS_PASS = ''

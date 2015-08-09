@@ -20,8 +20,10 @@ import md5
 import time
 import random
 import os
+import tarfile
 from tornado.httpclient import AsyncHTTPClient
-
+from docker.utils import create_host_config
+from docker.errors import APIError
 conn = Connection(host=settings.MQ_HOST,username=settings.MQ_USERNAME,
       password=settings.MQ_PASSWORD,heartbeat=settings.MQ_HEARTBEAT)
 msg = Message('Hello World!')
@@ -119,12 +121,13 @@ class BuildImage():
         t = tarfile.open(tar_file)
         t.extractall(path = arcpath) 
         t.close()
+        print arcpath,tar_file,content_path
         self.delete_tar_file(tar_file)
         tz = tarfile.open(new_tar_file, "w:gz")
-        for root, dir, files in os.walk(content_path):
+        for root, dir, files in os.walk(arcpath):
             for file in files:
                 fullpath = os.path.join(root, file)
-            print fullpath
+                print fullpath,file
                 tz.add(fullpath,arcname=file)
         tz.close()
         return new_tar_file
@@ -189,10 +192,12 @@ class BuildImage():
             return
         project_name = self._build_context.get("project_name",None)
         self._file_name = self.get_tar_file("/tmp/build_image/"+project_name+"-"+self._md5,"/tmp/build_image/"+project_name+"-"+self._md5+".tar",project_name+".git")
+        print self._file_name
         self._build_context["logs"].append({"info":u"获取附件完成，开始构建镜像" ,"user_id":self._user_id,"create_time":time.time()})
         cli = options.docker_client
         fp = open(self._file_name,"r")
         tag = settings.DOCKER_TAGPREFIX +"/"+self._user_name+"/"+project_name
+        self._build_context["storage_path"] = tag
         for line in cli.build(fileobj=fp, rm=True, tag=tag,custom_context=True,forcerm=True):
             # 写入数据库
             self._build_context["logs"].append({"info":line ,"user_id":self._user_id,"create_time":time.time()})
@@ -216,3 +221,33 @@ class StartContainer():
     s_application = ApplicationService()
     def __init__(self,start_context):
         self._start_context = start_context
+        self._storage_path = self._start_context["storage_path"]
+        self._user_id = self._start_context["user_id"]
+        self._project_name = self._start_context["project_name"]
+        self._user_name =  self._start_context["user_name"]
+        self._app_prefix = self._user_name+"-"+self._project_name+"-"
+        
+    def pull_image(self):
+        cli = options.docker_client
+        self._start_context["logs"].append({"info":"starting pull image:"+self._storage_path ,"user_id":self._user_id,"create_time":time.time()})
+        for line in cli.pull(storage_path,stream=True):
+            self._start_context["logs"].append({"info":line ,"user_id":self._user_id,"create_time":time.time()})
+        
+    def start_container(self):
+        host_config = create_host_config(publish_all_ports=True,restart_policy={'Name':'always'})
+        app_name = self._app_prefix+str(1)
+        try:
+            cli.remove_container(container=app_name,force=True)
+        except APIError,e:
+            logging.info("can't find container")
+        container = cli.create_container(image=self._storage_path,host_config=host_config,name=app_name)
+        response = cli.start(container=app_name)
+        self._start_context["app_name"] = app_name
+        self._start_context["run_host"] = settings.CURRENT_HOST 
+        self.update_database("success")
+        
+    @gen.coroutine
+    def update_database(self,status):
+        self._start_context["status"] = status
+        result = yield self.s_application.insert_app(self._start_context)
+    

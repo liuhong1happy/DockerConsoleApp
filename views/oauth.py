@@ -10,11 +10,13 @@ from util.oauth import GitLabOAuth2Mixin
 class GitLabOAuthHandler(BaseHandler,GitLabOAuth2Mixin):
     s_oauth = OAuthService()
     
+    @tornado.web.authenticated
     @tornado.gen.coroutine
     def get(self):
         code = self.get_argument('code', False)
         if code:
             access = yield self.get_authenticated_user(code=code)
+            print access
             user_info = yield self.get_user_info(access_token=access["access_token"])
             owned_projects = yield self.get_by_api("/api/v3/projects/owned",access_token=access["access_token"])
             user_info["projects"] =  owned_projects

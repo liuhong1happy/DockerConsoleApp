@@ -14,6 +14,7 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Se
     var client_id = config[env].gitlab.client_id;
     var redirect_uri = config[env].gitlab.redirect_uri;
     $scope.authLink = token+ "?client_id="+client_id+"&redirect_uri="+redirect_uri+"&response_type=code";
+    $window.console.log($scope.authLink);
     $scope.showScope = "user";
     $scope.activeUser = function(user_id){
         for(var u in $scope.users){

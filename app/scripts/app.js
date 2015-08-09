@@ -52,10 +52,10 @@ var angularApp = angular
         controller: 'CodeCtrl',
         controllerAs: 'code'
       })
-      .when('/cicd', {
-        templateUrl: 'views/cicd.html',
-        controller: 'CicdCtrl',
-        controllerAs: 'cicd'
+      .when('/service', {
+        templateUrl: 'views/service.html',
+        controller: 'ServiceCtrl',
+        controllerAs: 'service'
       })
       .when('/about', {
         templateUrl: 'views/about.html',
@@ -73,12 +73,12 @@ angularApp.factory("config",function(){
         dev:{
             hrefs:{
                 book:"http://192.168.0.110:4000",
-                code:"http://192.168.0.110:10080",
+                code:"http://localhost:10080",
                 test:"http://192.168.0.110:10081",
             },
             gitlab:{
                 token:"http://192.168.0.110:10080/oauth/authorize",
-                client_id:"9c7a33a2ed9dbe2ef77d91f9fd9c27de495ad8a68ae0609556401b09f7245d98",
+                client_id:"01841bc629e150c25d3eddffc23edc4092f86aad0c1d58fef67305a125ee2b90",
                 redirect_uri:"http://192.168.0.110:8888/api/gitlab/oauth",
             }
         },
@@ -91,7 +91,7 @@ angularApp.factory("config",function(){
             },
             gitlab:{
                 token:"http://gitlab.dockerdocs.cn/oauth/authorize",
-                client_id:"9c7a33a2ed9dbe2ef77d91f9fd9c27de495ad8a68ae0609556401b09f7245d98",
+                client_id:"01841bc629e150c25d3eddffc23edc4092f86aad0c1d58fef67305a125ee2b90",
                 redirect_uri:"http://gitlab.dockerdocs.cn/api/gitlab/oauth",
             }
         }

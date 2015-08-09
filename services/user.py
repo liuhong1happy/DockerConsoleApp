@@ -7,7 +7,6 @@ from tornado.concurrent import return_future
 class UserService():
     m_user = UserModel()
     @gen.coroutine
-    @return_future
     def signup(self,name,email,password,fields=None,callback=None):
         insertData = {
             "name":name,
@@ -25,7 +24,6 @@ class UserService():
         
         
     @gen.coroutine
-    @return_future
     def find_one(self,spec,fields=None,callback=None):
         result =yield self.m_user.find_one(spec,fields)
         raise gen.Return(result)

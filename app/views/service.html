@@ -22,7 +22,7 @@
                 <td>[[service.status]]</td>
                 <td>[[service.project_name]]</td>
                 <td>[[(service.update_time?service.update_time:service.create_time)*1000 | date:"yyyy-MM-dd hh:mm:ss"]]</td>
-                <td><a class="btn btn-success" ng-click="create_application(service._id)">创建任务</a></td>
+                <td><a class="btn btn-success" ng-click="create_application(service.project_name,service.project_url,service.storage_path)">创建任务</a></td>
             </tr>
         </tbody>
     </table>
