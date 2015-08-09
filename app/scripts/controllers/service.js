@@ -12,7 +12,7 @@ function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,
     $scope.page_index = 0;
     $scope.page_size = 20;
     $scope.services = [];
-    $scope.showList  = ["list","form","info"]
+    $scope.showList  = ["list","service"]
     $scope.showScope = $scope.showList[0];
     $scope.application_name = "";
     $scope.project_url = "";
@@ -43,7 +43,6 @@ function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,
         });
     }
     
-    
     $scope.create_application = function(project_name,project_url,storage_path){
       // 传递信息给后端，转到项目详情页面
       ApplicationRun.build(null,$.param({
@@ -59,7 +58,7 @@ function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,
               $scope.service = project;
               $scope.service["run_status"] = "查询过程中...";
               $scope.service["run_info"] = "查询过程中..."
-              $scope.showScope = "applications";
+              $scope.showScope = "service";
               $interval(getContainerInfo,1000);
               break;
             }
@@ -76,7 +75,10 @@ function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,
         alert("服务器错误");
       })
     }
-    
+    $scope.showServices = function(){
+      $scope.showScope = $scope.showList[0];;
+      $scope.service = null;
+    }
     $timeout(function () {
             Services.read({
                 "page_index":$scope.page_index,

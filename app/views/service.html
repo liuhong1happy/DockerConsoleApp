@@ -27,29 +27,21 @@
         </tbody>
     </table>
 </div>
-<div class="row" ng-Show="showScope=='form'"   style="margin:20px 120px;">
-<form role="form" name="service_form" class="form-horizontal" ng-submit="submitForm(service_form.$valid)"  novalidate> 
-    <div class="form-group has-feedback">
-        <label class="col-xs-2">应用名称</label>
-        <div class="col-xs-10"> 
-            <input type="text" class="form-control"  name="application_name" ng-model="application_name" required  ng-maxlength="20"/>
-            <span class="glyphicon glyphicon-ok form-control-feedback" ng-show="service_form.application_name.$dirty && service_form.application_name.$valid"></span>
-        </div>
+<div  class="row" ng-show="showScope=='service'">
+    <h2>[[service.project_name]]</h2>
+    <p>[[service.project_url]]</p>
+    <p>[[service.run_status]]</p>
+    <a ng-click="showServices()">返回</a>
+    <hr />
+</div>
+<div class="row" ng-show="showScope=='service'">
+    <div class="run-info">
+        <ul>
+            <li ng-repeat="info in service.run_info">
+                <p>[[info.info]]</p>
+            </li>
+        </ul>
     </div>
-    <div class="form-group has-feedback">
-        <label  class="col-xs-2">镜像名称</label>
-        <div  class="col-xs-10">
-            <input type="text" class="form-control"  name="project_name"  ng-model="project_name" required  ng-maxlength="200"/>
-            <span class="glyphicon glyphicon-ok form-control-feedback" ng-show="service_form.project_name.$dirty && service_form.project_name.$valid"></span>
-        </div>
-    </div>
-    <div class="form-group">
-      <input type="text" class="form-control" name="project_url" ng-model="project" style="display:none;"/>
-    </div>
-    <div class="form-group has-feedback">
-        <input class="btn btn-success" type="submit" ng-disabled="service_form.$invalid" value="提交"/>
-    </div>
-</form>
 </div>
 
 
