@@ -57,6 +57,11 @@ var angularApp = angular
         controller: 'ServiceCtrl',
         controllerAs: 'service'
       })
+      .when('/application', {
+        templateUrl: 'views/application.html',
+        controller: 'AppCtrl',
+        controllerAs: 'application'
+      })
       .when('/about', {
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl',

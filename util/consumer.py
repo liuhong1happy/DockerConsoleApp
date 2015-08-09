@@ -91,6 +91,7 @@ def create_service(msg):
 
 def run_application(msg):
     start_context = json.loads(msg.body)
+    print start_context
     builder = StartContainer(start_context)
     builder.start_run_application()
     msg.ack()
@@ -219,27 +220,42 @@ class BuildImage():
 
 class StartContainer():
     s_application = ApplicationService()
+    
+    
     def __init__(self,start_context):
         self._start_context = start_context
         self._storage_path = self._start_context["storage_path"]
         self._user_id = self._start_context["user_id"]
+        self._project_url = self._start_context["project_url"]
         self._project_name = self._start_context["project_name"]
         self._user_name =  self._start_context["user_name"]
         self._app_prefix = self._user_name+"-"+self._project_name+"-"
+       
     
     def start_run_application(self):
         self.pull_image()
         self.start_container()
     
+    @gen.coroutine
     def pull_image(self):
+        application = yield self.s_application.find_one(self._project_url)
+        if application is None:
+            return
+        logs = application["logs"]
+        if logs is None:
+            logs = []
+        if not isinstance(logs,list):
+            logs = []
+        self._start_context["logs"] = []
         cli = options.docker_client
         self._start_context["logs"].append({"info":"starting pull image:"+self._storage_path ,"user_id":self._user_id,"create_time":time.time()})
-        for line in cli.pull(storage_path,stream=True):
+        for line in cli.pull(self._storage_path,stream=True):
             self._start_context["logs"].append({"info":line ,"user_id":self._user_id,"create_time":time.time()})
         
     def start_container(self):
         host_config = create_host_config(publish_all_ports=True,restart_policy={'Name':'always'})
         app_name = self._app_prefix+str(1)
+        cli = options.docker_client
         try:
             cli.remove_container(container=app_name,force=True)
         except APIError,e:
@@ -253,5 +269,5 @@ class StartContainer():
     @gen.coroutine
     def update_database(self,status):
         self._start_context["status"] = status
-        result = yield self.s_application.insert_app(self._start_context)
+        result = yield self.s_application.insert_application(self._start_context)
     

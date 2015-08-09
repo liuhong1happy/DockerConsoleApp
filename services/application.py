@@ -1,44 +1,45 @@
 from models.application import ApplicationModel
-import tornado.gen
+from tornado import gen
 
 class ApplicationService():
     m_application = ApplicationModel()
     
-    @tornado.gen.coroutine
+    @gen.coroutine
     def insert_application(self,application,callback=None):
-        app_name = application.get("app_name",None)
-        if app_name is None:
+        project_url = application.get("project_url",None)
+        if project_url is None:
             raise gen.Return(None)
-        app = yield self.m_application.find_one({"app_name":app_name})
+        app = yield self.m_application.find_one({"project_url":project_url})
         model = {}
         if app is None:
-            model = yield self.m_application.insert_one(app)
+            model = yield self.m_application.insert_one(application)
             app = yield self.m_application.find_one(model.inserted_id)
         else:
-            model = yield self.m_application.update_one({"app_name":app_name},{"$set":app})
-        raise tornado.gen.Return(app)
+            model = yield self.m_application.update_one({"project_url":project_url},{"$set":application})
+        raise gen.Return(application)
     
-    @tornado.gen.coroutine
+    @gen.coroutine
     def exist_application(self,project_url,callback=None):
-        result = self.m_application.find_one({"project_url":project_url})
+        result = yield self.m_application.find_one({"project_url":project_url})
         if result==None or not isinstance(result,dict):
-            raise tornado.gen.Return(False)
+            raise gen.Return(False)
         else:
-            raise tornado.gen.Return(True)
+            raise gen.Return(True)
     
-    @tornado.gen.coroutine
+    @gen.coroutine
     def find_one(self,project_url,callback=None):
-        result = self.m_application.find_one({"project_url":project_url})
+        print project_url
+        result = yield self.m_application.find_one({"project_url":project_url})
         if result==None or not isinstance(result,dict):
-            raise tornado.gen.Return(None)
+            raise gen.Return(None)
         else:
-            raise tornado.gen.Return(result)
+            raise gen.Return(result)
 
-    @tornado.gen.coroutine
-    def get_appliactions(self,spec,fileds=None,sorts=None,page_index=0,page_size=20,callback=None):
+    @gen.coroutine
+    def get_appliactions(self,spec,fields=None,sorts=None,page_index=0,page_size=20,callback=None):
         skip = page_index*page_size
-        result_list = self.m_application.find(spec,fields,sorts,skip,page_size)
+        result_list =yield self.m_application.get_list(spec,fields,sorts,skip,page_size)
         if not result_list or len(result_list)==0:
-            raise tornado.gen.Return(None)
+            raise gen.Return(None)
         else:
-            raise tornado.gen.Return(result_list)
+            raise gen.Return(result_list)

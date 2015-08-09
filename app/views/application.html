@@ -1,0 +1,31 @@
+<div class="row" style="margin:20px 120px;">
+    <h2>应用管理</h2>
+    <p>这里可以查看到你开启的应用</p>
+    <hr />
+</div>
+<div class="row" style="margin:20px 120px;">
+    <table class="table">
+        <thead>
+            <tr>
+                <td>应用名称</td>
+                <td>镜像名称</td>
+                <td>构建状态</td>
+                <td>更新时间</td>
+                <td>操作</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="app in applications">
+                <td>[[app.app_name]]</td>
+                <td>[[app.project_name]]</td>
+                <td>[[app.status]]</td>
+                <td>[[(app.update_time?app.update_time:app.create_time)*1000 | date:"yyyy-MM-dd hh:mm:ss"]]</td>
+                <td>
+                    <a class="btn btn-success">重启</a>
+                    <a class="btn btn-success">停止</a>
+                    <a class="btn btn-success">删除</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

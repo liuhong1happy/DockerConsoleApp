@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from services.application import ApplicationService
 import tornado.web
-import tornado.gen
+from tornado import gen
 import tornado.escape
 import json
 from util.rabbitmq import send_message
@@ -13,7 +13,7 @@ import time
 
 class ApplicationRunHandler(AsyncBaseHandler):
     s_application = ApplicationService()
-    @tornado.gen.coroutine
+    @gen.coroutine
     def _post_(self):
         project_url = self.get_argument("project_url",None)
         project_name = self.get_argument("project_name",None)
@@ -58,13 +58,12 @@ class ApplicationInfoHandler(AsyncBaseHandler):
         "status":True,
         "logs":True
     }
-    @tornado.gen.coroutine
+    @gen.coroutine
     def _post_(self):
-        app_name = self.get_argument("app_name",None)
-        
-        app = yield self.s_application.find_one({"app_name":app_name},fields=self.fields)
+        project_url = self.get_argument("project_url",None)
+        app = yield self.s_application.find_one(project_url)
         app["_id"] = str(app["_id"])
-        if service is None:
+        if app is None:
             self.render_error(error_code=404,msg="not data")
         else:
             self.write_result(data=app)
@@ -81,7 +80,7 @@ class ApplicationsHandler(AsyncBaseHandler):
         "update_time":True,
         'create_time':True
     }
-    @tornado.gen.coroutine
+    @gen.coroutine
     def _get_(self):
         spec_type = self.get_argument("spec_type","app_name")
         spec_text =  self.get_argument("spec_text","")
@@ -89,8 +88,8 @@ class ApplicationsHandler(AsyncBaseHandler):
         page_size =int(self.get_argument("page_size",20))
         spec ={}
         spec[spec_type]={ '$regex' : spec_text}
-        applications =yield self.s_application.get_list(spec,fields=self.fields,page_index=page_index,page_size=page_size)
-        if not services:
+        applications =yield self.s_application.get_appliactions(spec,fields=self.fields,page_index=page_index,page_size=page_size)
+        if not applications:
             self.render_error(error_code=404,msg="not data")
         else:
             self.write_result(data=applications)

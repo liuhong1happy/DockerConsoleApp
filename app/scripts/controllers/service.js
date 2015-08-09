@@ -7,8 +7,8 @@
  * # CicdCtrl
  * Controller of the angularApp
  */
-angularApp.controller('ServiceCtrl', ["$scope","config","Services","Service","ApplicationRun","ApplicationInfo","$window","$timeout", 
-function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,$timeout) {
+angularApp.controller('ServiceCtrl', ["$scope","config","Services","Service","ApplicationRun","ApplicationInfo","$window","$interval","$timeout", 
+function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,$interval,$timeout) {
     $scope.page_index = 0;
     $scope.page_size = 20;
     $scope.services = [];
@@ -45,7 +45,7 @@ function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,
     
     $scope.create_application = function(project_name,project_url,storage_path){
       // 传递信息给后端，转到项目详情页面
-      ApplicationRun.build(null,$.param({
+      ApplicationRun.run(null,$.param({
         "project_name":project_name,
         "project_url":project_url,
         "storage_path":storage_path
@@ -53,21 +53,17 @@ function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,
         ,function(res){
           $scope.service = null;
           for(var i in $scope.services){
-            var service = user.projects[j];
-            if(service.web_url==project_url){
-              $scope.service = project;
+            var service = $scope.services[i];
+            if(service.project_url==project_url){
+              $scope.service = service;
               $scope.service["run_status"] = "查询过程中...";
               $scope.service["run_info"] = "查询过程中..."
-              $scope.showScope = "service";
+              $scope.showScope = $scope.showList[1];
               $interval(getContainerInfo,1000);
               break;
             }
-        
-          if(user.id==user_id){
-            break;
-          }
         }
-          if($scope.project==null){
+          if($scope.service==null){
             alert("很抱歉，没有帮您找到服务的详细信息")
           }
         }
@@ -93,7 +89,7 @@ function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,
             },function(e,err){
                 alert('请求失败');
             });
-        }, 10);
+        }, 100);
     
     $scope.submitForm = function(isValid) {
                 if (!isValid) {
@@ -112,7 +108,6 @@ function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,
             }
     };
 }]);
-    
 angularApp.factory('Services',["$resource",function($resource){
     return $resource('/api/services',{},{
         read:{
