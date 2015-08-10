@@ -1,5 +1,10 @@
-/node_modules
-/dist
-/.tmp
-/.sass-cache
-/bower_components
+/node_modules/
+/dist/
+.tmp/
+.sass-cache/
+/bower_components/
+*.pyc
+*~
+.idea/
+*.iml
+*.swp*.swp*.swp*.swp*.swp*.swp*.swp*.swp
