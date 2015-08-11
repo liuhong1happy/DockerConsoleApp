@@ -1,0 +1,5 @@
+pycket
+stormed-amqp
+pymongo
+docker-py
+tornado=4.2.1
