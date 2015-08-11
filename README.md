@@ -34,15 +34,7 @@ DockerConsoleApp目前是由docker社区的爱好者[注：起源docker百度贴
 - 自动化部署 docker-py
 - 数据库存储 mongodb
 
-## 节点部署
+## 开发文档和环境安装
 
-- web app
-- redis
-- mongodb
-- etcd
-- gitbook
-- gitlab
-- rabbitmq
-- register若干
-- discover
+请参考[wiki](https://github.com/liuhong1happy/DockerConsoleApp/wiki)，此处略！
 
