@@ -45,5 +45,7 @@ DockerConsoleApp目前是由docker社区的爱好者[注：起源docker百度贴
 如果你想进一步了解我们的开发进度和计划，或者想商业化我们的开源项目，请参见如下联系方式：
 
 QQ群号 181774264 <a target="_blank" href="http://shang.qq.com/wpa/qunwpa?idkey=825b5e3ee4bee23e51b0d77703a6c38c6cd0ca3d489340667a251a2e242f15de"><img border="0" src="http://pub.idqqimg.com/wpa/images/group.png" alt="Docker学习交流群" title="Docker学习交流群"></a><br/>
+
 百度贴吧 [docker](http://tieba.baidu.com/f?kw=docker)
+
 邮件 [liuhong1.happy@163.com](mailto:liuhong1.happy@163.com)
