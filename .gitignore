@@ -5,6 +5,7 @@
 /bower_components/
 *.pyc
 *~
+.git-credentials
 .idea/
 *.iml
 *.swp*.swp*.swp*.swp*.swp*.swp*.swp*.swp
