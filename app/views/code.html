@@ -1,42 +1,43 @@
-<div class="row" style="margin:20px 120px;" ng-show="showScope=='user'">
+<div class="row details-header"  ng-show="showScope=='user'">
     <h2>代码托管</h2>
     <p>我们需要获取你gitlab代码库列表，以便实现镜像自动构建、持续集成和自动部署</p>
     <a ng-hide="hasToken" class="btn btn-success" ng-href="authLink">开启托管</a>
     <hr />
 </div>
-<div class="row" ng-show="hasToken && showScope=='user'" style="margin:20px 120px;">
-    <div class="tab-nav">
-        <ul class="ul-nav nav nav-tabs">
-            <li  role="presentation" ng-repeat="user in users" ng-class="user.active?'active':'';" ng-style="user.active?{}:{}">
-                <a ng-click="activeUser(user.id)">  [[user.name]]</a>
-            </li>
-        </ul>
-        <ul class="nav nav-pills" ng-repeat="user in users" ng-show="user.active" style="border:1px solid #ddd;border-top:0px solid transparent;padding-top:10px;">
-            <li role="presentation" ng-repeat="project in user.projects" style="margin:0px 20px 20px;padding:20px;border:1px solid #00a28d;">
-                   <div class="project-avatar">[[project.avatar_url]]</div>
-                   <div class="project-name">[[project.name]]</div> 
-                   <div class="project-url">[[project.web_url]]</div> 
-                   <div class="project-link">
-                     <a ng-click="buildProject(user.id,project.id,project.name,project.web_url)">构建镜像</a>
-                   </div>
-            </li>
-        </ul>
+<div class="details-body">
+    <div class="row" ng-show="hasToken && showScope=='user'">
+        <div class="tab-nav">
+            <ul class="ul-nav nav nav-tabs">
+                <li  role="presentation" ng-repeat="user in users" ng-class="user.active?'active':'';" ng-style="user.active?{}:{}">
+                    <a ng-click="activeUser(user.id)">  [[user.name]]</a>
+                </li>
+            </ul>
+            <ul class="nav nav-pills" ng-repeat="user in users" ng-show="user.active">
+                <li role="presentation" ng-repeat="project in user.projects" style="margin:20px 30px 40px;padding:20px;border:1px solid #c0c8cf;">
+                       <div class="project-avatar">[[project.avatar_url]]</div>
+                       <div class="project-name">[[project.name]]</div> 
+                       <div class="project-url">[[project.web_url]]</div> 
+                       <div class="project-link text-right">
+                         <a ng-click="buildProject(user.id,project.id,project.name,project.web_url)">构建镜像</a>
+                       </div>
+                </li>
+            </ul>
+        </div>
     </div>
-</div>
-
-<div  class="row" ng-show="showScope=='project'">
-    <h2>[[project.name]]</h2>
-    <p>[[project.web_url]]</p>
-    <p>[[project.build_status]]</p>
-    <a ng-click="showUser()">返回</a>
-    <hr />
-</div>
-<div class="row" ng-show="showScope=='project'">
-    <div class="build-info">
-        <ul>
-            <li ng-repeat="info in project.build_info">
-                <p>[[info.info]]</p>
-            </li>
-        </ul>
+    <div  class="row" ng-show="showScope=='project'">
+        <h2>[[project.name]]</h2>
+        <p>[[project.web_url]]</p>
+        <p>[[project.build_status]]</p>
+        <a ng-click="showUser()">返回</a>
+        <hr />
+    </div>
+    <div class="row" ng-show="showScope=='project'">
+        <div class="build-info">
+            <ul>
+                <li ng-repeat="info in project.build_info">
+                    <p>[[info.info]]</p>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>

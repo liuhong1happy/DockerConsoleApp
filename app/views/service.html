@@ -1,46 +1,48 @@
-<div class="row" style="margin:20px 120px;">
+<div class="row details-header">
     <h2>代码构建</h2>
     <p>我们需要自动化去部署代码，必然会面临代码构建成容器镜像，本步骤即为构建镜像</p>
     <hr />
 </div>
-<div class="row" ng-Show="showScope=='list'"   style="margin:20px 120px;">
+<div class="details-body">
+    <div class="row" ng-Show="showScope=='list'" >
     <table class="table">
-        <thead>
-            <tr>
-                <td>任务名称</td>
-                <td>代码源</td>
-                <td>构建状态</td>
-                <td>镜像名称</td>
-                <td>更新时间</td>
-                <td>操作</td>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="service in services">
-                <td>[[service.project_name]]</td>
-                <td>[[service.project_url]]</td>
-                <td>[[service.status]]</td>
-                <td>[[service.project_name]]</td>
-                <td>[[(service.update_time?service.update_time:service.create_time)*1000 | date:"yyyy-MM-dd hh:mm:ss"]]</td>
-                <td><a class="btn btn-success" ng-click="create_application(service.project_name,service.project_url,service.storage_path)">创建任务</a></td>
-            </tr>
-        </tbody>
+    <thead>
+        <tr>
+            <th>任务名称</th>
+            <th>代码源</th>
+            <th>构建状态</th>
+            <th>镜像名称</th>
+            <th>更新时间</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="service in services">
+            <td>[[service.project_name]]</td>
+            <td>[[service.project_url]]</td>
+            <td>[[service.status]]</td>
+            <td>[[service.project_name]]</td>
+            <td>[[(service.update_time?service.update_time:service.create_time)*1000 | date:"yyyy-MM-dd hh:mm:ss"]]</td>
+            <td><a class="btn btn-success" ng-click="create_application(service.project_name,service.project_url,service.storage_path)">创建任务</a></td>
+        </tr>
+    </tbody>
     </table>
-</div>
-<div  class="row" ng-show="showScope=='service'">
+    </div>
+    <div  class="row" ng-show="showScope=='service'">
     <h2>[[service.project_name]]</h2>
     <p>[[service.project_url]]</p>
     <p>[[service.run_status]]</p>
     <a ng-click="showServices()">返回</a>
     <hr />
-</div>
-<div class="row" ng-show="showScope=='service'">
+    </div>
+    <div class="row" ng-show="showScope=='service'">
     <div class="run-info">
-        <ul>
-            <li ng-repeat="info in service.run_info">
-                <p>[[info.info]]</p>
-            </li>
-        </ul>
+    <ul>
+        <li ng-repeat="info in service.run_info">
+            <p>[[info.info]]</p>
+        </li>
+    </ul>
+    </div>
     </div>
 </div>
 
