@@ -16,7 +16,7 @@ RUN cd /app/libs/stormed-amqp/ && python setup.py install
 WORKDIR /app
 RUN npm install 
 RUN bower install --allow-root 
-RUN grunt build
+RUN grunt --force
 # 默认挂载/var/run和/app
 VOLUME ["/var/run","/app"]
 # 默认暴露80端口
