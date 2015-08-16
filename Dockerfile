@@ -7,6 +7,7 @@ ENV USER_NAME admin
 ENV SERVICE_ID console
 # 安装git
 RUN apt-get install -y git
+RUN mkdir /code
 RUN git clone https://github.com/liuhong1happy/DockerConsoleApp /code
 # 安装python库
 COPY requirements.txt /requirements.txt
