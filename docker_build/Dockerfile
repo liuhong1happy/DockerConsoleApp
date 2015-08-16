@@ -11,6 +11,7 @@ RUN git clone https://github.com/liuhong1happy/DockerConsoleApp /app
 # 安装python库
 COPY requirements.txt /requirements.txt
 RUN  pip install -r /requirements.txt
+RUN cat /app/libs/stormed-amqp/setup.py
 RUN python /app/libs/stormed-amqp/setup.py install
 # 拷贝代码
 WORKDIR /app
