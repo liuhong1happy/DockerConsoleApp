@@ -7,12 +7,10 @@ ENV USER_NAME admin
 # 安装git
 RUN apt-get install -y git
 RUN git clone https://github.com/liuhong1happy/DockerConsoleApp /code
-RUN cp
 # 安装python库
 COPY requirements.txt /requirements.txt
 RUN  pip install -r /requirements.txt
 # 拷贝代码
-COPY . /code
 WORKDIR /code
 RUN npm install && bower install && grunt
 # 默认挂载/var/run和/code
