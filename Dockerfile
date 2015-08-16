@@ -4,6 +4,7 @@ FROM liuhong1happy/docker-angularjs
 MAINTAINER  liuhong1.happy@163.com
 # 添加环境变量
 ENV USER_NAME admin
+ENV SERVICE_ID console
 # 安装git
 RUN apt-get install -y git
 RUN git clone https://github.com/liuhong1happy/DockerConsoleApp /code
