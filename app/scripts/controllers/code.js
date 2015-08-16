@@ -9,12 +9,17 @@
  */
 angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","ServiceBuild","ServiceInfo","$interval", 
   function ($scope,config,$window,GitLabToken,ServiceBuild,ServiceInfo,$interval) {
-    var env = config.envirement;
-    var token = config[env].gitlab.token;
-    var client_id = config[env].gitlab.client_id;
-    var redirect_uri = config[env].gitlab.redirect_uri;
-    $scope.authLink = token+ "?client_id="+client_id+"&redirect_uri="+redirect_uri+"&response_type=code";
-    $window.console.log($scope.authLink);
+
+      
+    $scope.showLink = function(){
+            var env = config.envirement;
+            var token = config[env].gitlab.token;
+            var client_id = config[env].gitlab.client_id;
+            var redirect_uri = config[env].gitlab.redirect_uri;
+            $scope.auth_link = token+ "?client_id="+client_id+"&redirect_uri="+redirect_uri+"&response_type=code";
+            $window.console.log($scope.auth_link);
+    }
+      
     $scope.showScope = "user";
     $scope.activeUser = function(user_id){
         for(var u in $scope.users){
@@ -26,8 +31,11 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Se
         $scope.showScope = "user";
     }
     
-    var getImageInfo = function(){
-        if($scope.project==null) $interval.cancel(getImageInfo);
+    $scope.intervalId = null;
+    $scope.getImageInfo = function(){
+        if($scope.intervalId==null){
+            return;
+        }
         
         var project_name = $scope.project["name"];
         var project_url = $scope.project["web_url"];
@@ -42,10 +50,13 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Se
           $scope.project["build_status"] = build_status;
           $scope.project["build_info"] = build_info;
           if(build_status=="success"){
-            $interval.cancel(getImageInfo);
+             $window.console.log($scope.intervalId);
+             $interval.cancel($scope.intervalId);
+             $scope.intervalId = null;
           }
         },function(e,err){
-          $interval.cancel(getImageInfo);
+          $interval.cancel($scope.intervalId);
+          $scope.intervalId = null;
           $scope.project["build_status"] = "抱歉，网络原因无法得知当前状态";
           $scope.project["build_info"] = "抱歉,网络原因无法更新日志";
         });
@@ -67,7 +78,7 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Se
               $scope.project["build_status"] = "查询过程中...";
               $scope.project["build_info"] = "查询过程中..."
               $scope.showScope = "project";
-              $interval(getImageInfo,1000);
+              $scope.intervalId = $interval($scope.getImageInfo,1000);
               break;
             }
           }
@@ -97,7 +108,7 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Se
               $scope.project["build_status"] = "查询过程中...";
               $scope.project["build_info"] = "查询过程中..."
               $scope.showScope = "project";
-              $interval(getImageInfo,1000);
+              $scope.intervalId =  $interval($scope.getImageInfo,1000);
               break;
             }
           }
@@ -130,11 +141,14 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Se
                 $scope.users = users; 
                 $window.console.log(users);
                 $scope.showScope = "user";
+                
             }else{
                 $scope.hasToken = false; 
+                $scope.showLink();
             }
         }else{
-            alert("服务器异常");
+            $scope.hasToken = false; 
+            $scope.showLink();
         }
     },function(e,err){
         alert("服务器错误");

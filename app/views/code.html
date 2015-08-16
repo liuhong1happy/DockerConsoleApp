@@ -1,7 +1,7 @@
 <div class="row details-header"  ng-show="showScope=='user'">
     <h2>代码托管</h2>
     <p>我们需要获取你gitlab代码库列表，以便实现镜像自动构建、持续集成和自动部署</p>
-    <a ng-hide="hasToken" class="btn btn-success" ng-href="authLink">开启托管</a>
+    <a ng-hide="hasToken" class="btn btn-success" ng-href="[[auth_link]]">开启托管</a>
     <hr />
 </div>
 <div class="details-body">
