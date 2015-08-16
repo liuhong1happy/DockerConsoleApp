@@ -6,7 +6,8 @@ MAINTAINER  liuhong1.happy@163.com
 ENV USER_NAME admin
 # 安装git
 RUN apt-get install -y git
-RUN git clone 
+RUN git clone https://github.com/liuhong1happy/DockerConsoleApp /code
+RUN cp
 # 安装python库
 COPY requirements.txt /requirements.txt
 RUN  pip install -r /requirements.txt
