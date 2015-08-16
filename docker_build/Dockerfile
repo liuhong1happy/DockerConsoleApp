@@ -7,16 +7,15 @@ ENV USER_NAME admin
 ENV SERVICE_ID console
 # 安装git
 RUN apt-get install -y git
-RUN rm -R /code
-RUN git clone https://github.com/liuhong1happy/DockerConsoleApp /code
+RUN git clone https://github.com/liuhong1happy/DockerConsoleApp /app
 # 安装python库
 COPY requirements.txt /requirements.txt
 RUN  pip install -r /requirements.txt
 # 拷贝代码
-WORKDIR /code
+WORKDIR /app
 RUN npm install && bower install && grunt
-# 默认挂载/var/run和/code
-VOLUME ["/var/run","/code"]
+# 默认挂载/var/run和/app
+VOLUME ["/var/run","/app"]
 # 默认暴露80端口
 EXPOSE 80
 # 配置supervisord
