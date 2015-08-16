@@ -11,6 +11,8 @@ RUN  pip install -r requirements.txt
 COPY . /code
 WORKDIR /code
 RUN npm install && bower install && grunt
+# 默认挂载/var/run和/code
+VOLUME ["/var/run","/code"]
 # 默认暴露80端口
 EXPOSE 80
 # 配置supervisord
