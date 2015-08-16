@@ -24,7 +24,7 @@ MONGO_DB = 'admin'
 MONGO_USER = 'mongo'
 MONGO_PWD = '123456'
 
-ETCD_HOST = 'localhost'
+ETCD_HOST = '192.168.0.110'
 ETCD_PORT = 4001
 
 # discover host
