@@ -11,7 +11,7 @@ RUN git clone https://github.com/liuhong1happy/DockerConsoleApp /app
 # 安装python库
 COPY requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
-RUN python /app/libs/stormed-amqp/setup.py install
+RUN cd /app/libs/stormed-amqp/ && python setup.py install
 # 拷贝代码
 WORKDIR /app
 RUN npm install && bower install && grunt
