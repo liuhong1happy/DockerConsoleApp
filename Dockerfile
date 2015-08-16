@@ -4,9 +4,12 @@ FROM liuhong1happy/docker-angularjs
 MAINTAINER  liuhong1.happy@163.com
 # 添加环境变量
 ENV USER_NAME admin
+# 安装git
+RUN apt-get install -y git
+RUN git clone 
 # 安装python库
-COPY requirements.txt requirements.txt
-RUN  pip install -r requirements.txt
+COPY requirements.txt /requirements.txt
+RUN  pip install -r /requirements.txt
 # 拷贝代码
 COPY . /code
 WORKDIR /code
