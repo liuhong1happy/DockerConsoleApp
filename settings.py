@@ -38,7 +38,7 @@ DOCKER_TAGPREFIX = "192.168.0.110:5000"
 # docker start container
 CURRENT_HOST = '192.168.0.110'
 
-MQ_HOST = 'localhost'
+MQ_HOST = '192.168.0.110'
 MQ_HEARTBEAT = 30
 MQ_USERNAME = 'admin'
 MQ_PASSWORD = 'testpass'
@@ -53,7 +53,7 @@ RUN_APPLICATION_QUEUE = 'run_application_queue'
 RUN_APPLICATION_ROUTING = 'run_application_routing'
 
 # gitlab settings
-GITLAB_SITE_URL = 'http://localhost:10080'
+GITLAB_SITE_URL = 'http://192.168.0.110:10080'
 GITLAB_OAUTH = {
     "authorize_url":GITLAB_SITE_URL+"/oauth/authorize",
     "access_token_url":GITLAB_SITE_URL+"/oauth/token",
@@ -64,6 +64,6 @@ GITLAB_OAUTH = {
 }
 
 # redis 
-REDIS_HOST = 'localhost'
+REDIS_HOST = '192.168.0.110'
 REDIS_PORT = '6379'
 REDIS_PASS = ''
