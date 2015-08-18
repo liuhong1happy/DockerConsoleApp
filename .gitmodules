@@ -1,3 +1,6 @@
 [submodule "stormed-amqp"]
-	path = libs/stormed-amqp
+	path = bin/stormed-amqp
 	url = https://github.com/paolo-losi/stormed-amqp.git
+[submodule "docker-console"]
+	path = bin/docker-console
+	url = https://github.com/Dockerlover/docker-console.git
