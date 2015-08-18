@@ -1,0 +1,3 @@
+[submodule "stormed-amqp"]
+	path = libs/stormed-amqp
+	url = https://github.com/paolo-losi/stormed-amqp.git
