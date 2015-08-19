@@ -17,6 +17,11 @@ DockerConsoleApp目前是由docker社区的爱好者[注：起源docker百度贴
 - 自动化测试：选择CI工具，对平台代码或者托管的代码库进行自动化测试
 - 自动化部署：借用webhooks或者自己开发web回调API接口实现自动化部署
 
+## 未来版本规划
+
+1.x 一键部署
+2.x web api
+
 ## 技术列表
 
 - 后端开发语言 python 2.7
