@@ -290,6 +290,7 @@ class AccessContainer():
         self._access_context = access_context
         self._user_id = self._access_context["user_id"]
         self._container_name = self._access_context["container_name"]
+        self._container_content = self._access_context["container_content"]
         self._container_id = self._access_context["container_id"]
         self._user_name =  self._access_context["user_name"]
         self._access_type =  self._access_context["access_type"]
@@ -302,26 +303,34 @@ class AccessContainer():
           self.stop_container()
         if(self._access_type=="delete"):
           self.delete_container()
+        if(self._access_type=="exec"):
+          self.exec_container()
     
     def restart_container():
         cli = options.docker_client
         response = cli.start(container=self._container_name)
-        print response
+        self._access_context["response"] = response
         update_database("success")
    
     def stop_container():
         cli = options.docker_client
         response = cli.stop(container=self._container_name)
-        print response
+        self._access_context["response"] = response
         update_database("success")
     
     def delete_container():
         cli = options.docker_client
         response = cli.remove_container(container=self._container_name)
-        print response
+        self._access_context["response"] = response
+        update_database("success")
+    
+    def exec_container():
+        cli = options.docker_client
+        exec_obj = cli.exec_create(container=self._container_name,cmd=self._container_content.slipt(' '))
+        response = cli.exec_start(exec_id=exec_obj["Id"])
+        self._access_context["response"] = response
         update_database("success")
         
-    
     @gen.coroutine
     def update_database(self,status):
         self._access_context["status"] = status
