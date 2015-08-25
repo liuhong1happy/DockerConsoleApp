@@ -52,6 +52,10 @@ RUN_APPLICATION_EXCHANGE = 'run_application_exchange'
 RUN_APPLICATION_QUEUE = 'run_application_queue'
 RUN_APPLICATION_ROUTING = 'run_application_routing'
 
+ACCESS_APPLICATION_EXCHANGE = 'access_application_exchange'
+ACCESS_APPLICATION_QUEUE = 'access_application_queue'
+ACCESS_APPLICATION_ROUTING = 'access_application_routing'
+
 # gitlab settings
 GITLAB_SITE_URL = 'http://192.168.0.110:10080'
 GITLAB_OAUTH = {
