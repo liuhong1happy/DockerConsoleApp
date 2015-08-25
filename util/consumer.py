@@ -304,16 +304,23 @@ class AccessContainer():
           self.delete_container()
     
     def restart_container():
-        container_name = self._container_name
+        cli = options.docker_client
+        response = cli.start(container=self._container_name)
+        print response
         update_database("success")
    
     def stop_container():
-        container_name = self._container_name
+        cli = options.docker_client
+        response = cli.stop(container=self._container_name)
+        print response
         update_database("success")
     
     def delete_container():
-        container_name = self._container_name
+        cli = options.docker_client
+        response = cli.remove_container(container=self._container_name)
+        print response
         update_database("success")
+        
     
     @gen.coroutine
     def update_database(self,status):
