@@ -26,6 +26,9 @@ function ($scope,config,$window,$timeout,Applications) {
                 alert('请求失败');
             });
         }, 100);
+    $scope.container_access = function(access_type,_id){
+      
+    }
 }]);
 
 angularApp.factory('Applications',["$resource",function($resource){
