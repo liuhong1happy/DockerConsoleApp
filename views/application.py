@@ -133,7 +133,7 @@ class ApplicationAccessHandler(AsyncBaseHandler):
             "user_name":user_name,
             "reply_to":'access_logs'
         }))
-        send_message(msg,settings.ACCESS_APPLICATION_EXCHANGE,settings.ACCESS_APPLICATION_ROUTING)
+        send_message(msg,settings.ACCESS_APPLICATION_EXCHANGE,settings.ACCESS_APPLICATION_ROUTING+"."+container_host)
         if result is None:
             self.render_error(error_code=404,msg="not data")
         else:
