@@ -22,9 +22,9 @@
                 <td>[[app.status]]</td>
                 <td>[[(app.update_time?app.update_time:app.create_time)*1000 | date:"yyyy-MM-dd hh:mm:ss"]]</td>
                 <td>
-                    <a class="btn btn-success" ng-click="container_access('restart',[[app._id]])">重启</a>
-                    <a class="btn btn-success" ng-click="container_access('stop',[[app._id]])">停止</a>
-                    <a class="btn btn-success" ng-click="container_access('delete',[[app._id]])">删除</a>
+                    <a class="btn btn-success" ng-click="container_access('restart','[[app._id]]')">重启</a>
+                    <a class="btn btn-success" ng-click="container_access('stop','[[app._id]]')">停止</a>
+                    <a class="btn btn-success" ng-click="container_access('delete','[[app._id]]')">删除</a>
                 </td>
             </tr>
         </tbody>
