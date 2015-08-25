@@ -334,4 +334,4 @@ class AccessContainer():
     @gen.coroutine
     def update_database(self,status):
         self._access_context["status"] = status
-        result = yield self.s_application_access.insert_application_access(self._access_context)
+        result = yield self.s_application_access.access_application(self._access_context)
