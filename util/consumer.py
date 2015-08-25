@@ -60,12 +60,19 @@ def init_queue():
                   exchange=settings.RUN_APPLICATION_EXCHANGE,
                   routing_key=settings.RUN_APPLICATION_ROUTING)
 
+    ch.exchange_declare(exchange= settings.ACCESS_APPLICATION_EXCHANGE , type='topic',durable=True)
+    ch.queue_declare(queue=settings.ACCESS_APPLICATION_QUEUE,durable=True)
+    ch.queue_bind(queue=settings.ACCESS_APPLICATION_QUEUE,
+                  exchange=settings.ACCESS_APPLICATION_EXCHANGE,
+                  routing_key=settings.ACCESS_APPLICATION_ROUTING+"."+settings.CURRENT_HOST)
+
     logging.info("Declare amqp queue and exchange")
     
 def init_consumer():
     ch = conn.channel()
     ch.consume(settings.CREATE_SERVICE_QUEUE,create_service,no_ack=False)
     ch.consume(settings.RUN_APPLICATION_QUEUE,run_application,no_ack=False)
+    ch.consume(settings.ACCESS_APPLICATION_QUEUE,access_application,no_ack=False)
     logging.info("Init amqp consumer success")
 
 def init_amqp():
@@ -91,9 +98,14 @@ def create_service(msg):
 
 def run_application(msg):
     start_context = json.loads(msg.body)
-    print start_context
     builder = StartContainer(start_context)
     builder.start_run_application()
+    msg.ack()
+
+def access_application(msg):
+    access_context = json.loads(msg.body)
+    builder = AccessContainer(access_context)
+    builder.start_access_application()
     msg.ack()
 
 class BuildImage():
@@ -270,4 +282,40 @@ class StartContainer():
     def update_database(self,status):
         self._start_context["status"] = status
         result = yield self.s_application.insert_application(self._start_context)
+
+class AccessContainer():
+    s_application_access = ApplicationAccessService()
     
+    def __init__(self,start_context):
+        self._access_context = access_context
+        self._user_id = self._access_context["user_id"]
+        self._container_name = self._access_context["container_name"]
+        self._container_id = self._access_context["container_id"]
+        self._user_name =  self._access_context["user_name"]
+        self._access_type =  self._access_context["access_type"]
+        self._access_content =  self._access_context["access_content"]
+        
+    def start_access_application(self):
+        if(self._access_type=="restart"):
+          self.restart_container()
+        if(self._access_type=="stop"):
+          self.stop_container()
+        if(self._access_type=="delete"):
+          self.delete_container()
+    
+    def restart_container():
+        container_name = self._container_name
+        update_database("success")
+   
+    def stop_container():
+        container_name = self._container_name
+        update_database("success")
+    
+    def delete_container():
+        container_name = self._container_name
+        update_database("success")
+    
+    @gen.coroutine
+    def update_database(self,status):
+        self._access_context["status"] = status
+        result = yield self.s_application_access.insert_application(self._access_context)
