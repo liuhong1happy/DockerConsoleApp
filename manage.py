@@ -22,7 +22,7 @@ class Application(tornado.web.Application):
         from views.service import ServicesHandler,ServiceInfoHandler,ServiceBuildHandler
         from views.login import LoginHandler,SigninHandler,SignupHandler,ForgetHandler
         from views.oauth import GitLabOAuthHandler,GitLabTokenHandler
-        from views.application import ApplicationsHandler,ApplicationInfoHandler,ApplicationRunHandler
+        from views.application import ApplicationsHandler,ApplicationInfoHandler,ApplicationRunHandler,ApplicationAccessHandler
         handlers = [
              (r"/", HomeHandler),
              (r"/login",LoginHandler),
@@ -35,6 +35,7 @@ class Application(tornado.web.Application):
              (r"/api/applications",ApplicationsHandler),
              (r"/api/application/info",ApplicationInfoHandler),
              (r"/api/application/run",ApplicationRunHandler),
+             (r"/api/application/access",ApplicationAccessHandler),
              (r"/api/gitlab/oauth",GitLabOAuthHandler),
              (r"/api/gitlab/token",GitLabTokenHandler)
         ]

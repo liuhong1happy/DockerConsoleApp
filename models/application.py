@@ -9,6 +9,7 @@ class ApplicationModel(BaseModel):
         "project_name":True,
         "storage_path":True,
         "app_name":True,
+        "run_host":True,
         "user_id":True,
         "status":True,
         "logs":True,

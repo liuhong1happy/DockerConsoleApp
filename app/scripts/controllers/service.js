@@ -17,9 +17,9 @@ function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,
     $scope.application_name = "";
     $scope.project_url = "";
     $scope.project_name = "";
-    
+    $scope.intervalId = null;
     var getContainerInfo = function(){
-        if($scope.service==null) $interval.cancel(getContainerInfo);
+        if($scope.service==null) $interval.cancel($scope.intervalId);
         
         var project_name = $scope.service["project_name"];
         var project_url = $scope.service["project_url"];
@@ -34,10 +34,10 @@ function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,
           $scope.service["run_status"] = run_status;
           $scope.service["run_info"] = run_info;
           if(run_status=="success"){
-            $interval.cancel(getContainerInfo);
+            $interval.cancel($scope.intervalId);
           }
         },function(e,err){
-          $interval.cancel(getContainerInfo);
+          $interval.cancel($scope.intervalId);
           $scope.service["run_status"] = "抱歉，网络原因无法得知当前状态";
           $scope.service["run_info"] = "抱歉,网络原因无法更新日志";
         });
@@ -59,7 +59,8 @@ function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,
               $scope.service["run_status"] = "查询过程中...";
               $scope.service["run_info"] = "查询过程中..."
               $scope.showScope = $scope.showList[1];
-              $interval(getContainerInfo,1000);
+              
+              $scope.intervalId = $interval(getContainerInfo,1000);
               break;
             }
         }

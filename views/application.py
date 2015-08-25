@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from services.application import ApplicationService
+from services.application_access import ApplicationAccessService
 import tornado.web
 from tornado import gen
 import tornado.escape
@@ -96,21 +97,34 @@ class ApplicationsHandler(AsyncBaseHandler):
             
 class ApplicationAccessHandler(AsyncBaseHandler):
     s_application = ApplicationService()
+    s_application_access = ApplicationAccessService()
+    
     @gen.coroutine
     def _get_(self):
+        access_id = self.get_argument("id",None)
+        access_info =     s_application_access.find_one(access_id)
+        if access_info is None:
+            self.render_error(error_code=404,msg="not data")
+        else:
+            self.write_result(data=access_info)
+    
+    @gen.coroutine
+    def _post_(self):
         access_type = self.get_argument("type",None)
         container_id = self.get_argument("id",None)
         access_content = self.get_argument("content","")
+        container_info = self.s_application.find_one(container_id)
         # 从数据库获取，切记不要对外公开
-        # container_host = self.get_argument("host",None)
+        container_host = container_info["run_host"]
+        container_name = container_info["app_name"]
         user_id = str(self.current_user.get("_id",None))
         user_name = str(self.current_user.get("name",None))
         create_time = time.time()
-
         # 数据库操作
         accessData = {}
         accessData["access_type"] = access_type
         accessData["container_id"] = container_id
+        accessData["container_name"] = container_name
         accessData["container_host"] = container_host
         accessData["access_content"] = container_content
         accessData["user_id"] = user_id
@@ -125,10 +139,12 @@ class ApplicationAccessHandler(AsyncBaseHandler):
         result= yield self.s_application_access.access_application(accessData)
         # 加入队列
         msg = Message( json.dumps({
+            "access_id":result["_id"],
             "access_type":access_type,
+            "access_content":access_content,
             "container_id":container_id,
             "container_host":container_host,
-            "access_content":access_content,
+            "container_name":container_name,
             "user_id":user_id,
             "user_name":user_name,
             "reply_to":'access_logs'
