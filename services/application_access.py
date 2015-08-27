@@ -7,7 +7,8 @@ class ApplicationAccessService():
     @gen.coroutine
     def access_application(self,access,callback=None):
         access_id = access.get("access_id",None)
-        model = {},id=""
+        model = {}
+	id = ""
         if access_id is None:
             model = yield self.m_application_access.insert_one(application)
             access_id = str(model.inserted_id)
