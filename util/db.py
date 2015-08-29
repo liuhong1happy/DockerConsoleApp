@@ -11,7 +11,7 @@ def init_db():
         db_client = MongoClient(uri)
         options.db_client = db_client
         logging.info("Init db successed")
-    except Exception,e:
+    except Exception as e:
         logging.error("Init db failed",e);
 
     return db_client

@@ -33,6 +33,17 @@ class GitLabOAuth2Mixin(OAuth2Mixin):
                    functools.partial(self._on_access_token, callback),
                    method="POST", headers={'Content-Type': 'application/x-www-form-urlencoded'}, body=body)
         
+    @_auth_return_future
+    def update_authenticated_user(self, refresh_token, callback):
+        http = self.get_auth_http_client()
+        body = urllib_parse.urlencode({
+            "refresh_token": refresh_token,
+            "grant_type": "refresh_token",
+        })
+        http.fetch(self._OAUTH_ACCESS_TOKEN_URL,
+                   functools.partial(self._on_access_token, callback),
+                   method="POST", headers={'Content-Type': 'application/x-www-form-urlencoded'}, body=body)
+        
     def _on_oauth2_request(self, future, response):
         if response.error:
             future.set_exception(AuthError("Error response %s fetching %s" %

@@ -78,7 +78,7 @@ scrollbar gripper {
   margin: 0px -15px 0px -15px;
   background-color: transparent;
   border-bottom: 1px solid #c0c8cf;
-  pading: 120px 60px;
+  padding: 120px 60px;
 }
 .firstJumbotron {
   height: 640px;
@@ -193,3 +193,11 @@ a:focus,a:hover{
     padding: 12px 0px 6px 0px;
     cursor: pointer;
 }
+
+
+  @media(min-width: 1366px) {
+    .jumbotron {
+      padding: 240px 60px;
+      height: 980px;
+    }
+  }

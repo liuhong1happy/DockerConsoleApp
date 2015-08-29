@@ -7,17 +7,57 @@
  * # CodeCtrl
  * Controller of the angularApp
  */
-angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","ServiceBuild","ServiceInfo","$interval", 
-  function ($scope,config,$window,GitLabToken,ServiceBuild,ServiceInfo,$interval) {
-
+angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","GitLabRefresh","ServiceBuild","ServiceInfo","$interval", 
+  function ($scope,config,$window,GitLabToken,GitLabRefresh,ServiceBuild,ServiceInfo,$interval) {
       
+     var getTokenByApi = function(){
+        $window.console.log("get-token");
+        GitLabToken.getToken({},function(res){
+            if(res && res.status=="success"){
+                if(res.data && res.data.access_token){
+                    $scope.hasToken = true; 
+                    var tokenData = res.data;
+                    var user_info = tokenData.user_info;
+                    var groups_info = tokenData.groups_info;
+                    // 根据token获取代码库列表
+                    var users = []
+                    users.push({"id":"u"+user_info.id, "name":user_info.name, "projects":user_info.projects,"active":true });
+                    for(var i in groups_info){
+                        var group = groups_info[i];
+                        users.push({"id":"g"+group.id,"name":group.name,"projects":group.details.projects,"active":false});
+                    }
+                    $scope.users = users; 
+                    $window.console.log(users);
+                    $scope.showScope = "user";
+
+                }else{
+                    $scope.hasToken = false; 
+                    $scope.showLink();
+                }
+            }else{
+                $scope.hasToken = false; 
+                $scope.showLink();
+            }
+        },function(e,err){
+            alert("服务器错误");
+        });
+     }
+
     $scope.showLink = function(){
             var env = config.envirement;
             var token = config[env].gitlab.token;
             var client_id = config[env].gitlab.client_id;
             var redirect_uri = config[env].gitlab.redirect_uri;
             $scope.auth_link = token+ "?client_id="+client_id+"&redirect_uri="+redirect_uri+"&response_type=code";
-            $window.console.log($scope.auth_link);
+    }
+    
+    $scope.updateProjects = function(){
+        GitLabRefresh.refresh({},function(res){
+            getTokenByApi();
+            alert("刷新成功");
+        },function(e,err){
+            alert("刷新错误");
+        });
     }
       
     $scope.showScope = "user";
@@ -119,45 +159,28 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Se
         if($scope.project==null){
           alert("很抱歉，没有帮您找到项目的详细信息")
         }
-      },function(e,err){
+      },
+      function(e,err){
         alert("服务器错误");
       })
     }
     
-    GitLabToken.getToken({},function(res){
-        if(res && res.status=="success"){
-            if(res.data && res.data.access_token){
-                $scope.hasToken = true; 
-                var tokenData = res.data;
-                var user_info = tokenData.user_info;
-                var groups_info = tokenData.groups_info;
-                // 根据token获取代码库列表
-                var users = []
-                users.push({"id":"u"+user_info.id, "name":user_info.name, "projects":user_info.projects,"active":true });
-                for(var i in groups_info){
-                    var group = groups_info[i];
-                    users.push({"id":"g"+group.id,"name":group.name,"projects":group.details.projects,"active":false});
-                }
-                $scope.users = users; 
-                $window.console.log(users);
-                $scope.showScope = "user";
-                
-            }else{
-                $scope.hasToken = false; 
-                $scope.showLink();
-            }
-        }else{
-            $scope.hasToken = false; 
-            $scope.showLink();
-        }
-    },function(e,err){
-        alert("服务器错误");
-    });
+    // 获取gitlab项目信息
+    getTokenByApi();
 }]);
 
 angularApp.factory('GitLabToken',["$resource",function($resource){
     return $resource('/api/gitlab/token',null,{
         "getToken":{
+            method:"get",
+            isArray:false
+        }
+    });
+}]);
+      
+angularApp.factory('GitLabRefresh',["$resource",function($resource){
+    return $resource('/api/gitlab/refresh',null,{
+        "refresh":{
             method:"get",
             isArray:false
         }

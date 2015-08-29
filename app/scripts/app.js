@@ -77,14 +77,14 @@ angularApp.factory("config",function(){
         envirement:"dev",
         dev:{
             hrefs:{
-                book:"http://192.168.0.110:4000",
-                code:"http://localhost:10080",
-                test:"http://192.168.0.110:10081",
+                book:"http://www.dockerconsole.com:4000",
+                code:"http://www.dockerconsole.com:10080",
+                test:"http://www.dockerconsole.com:10081",
             },
             gitlab:{
-                token:"http://192.168.0.110:10080/oauth/authorize",
-                client_id:"01841bc629e150c25d3eddffc23edc4092f86aad0c1d58fef67305a125ee2b90",
-                redirect_uri:"http://192.168.0.110:8888/api/gitlab/oauth",
+                token:"http://www.dockerconsole.com:10080/oauth/authorize",
+                client_id:"85f65cd2239dcb49996e1eff34d375db40c2d8af7af2cbac17a2826ca3c1ebfc",
+                redirect_uri:"http://www.dockerconsole.com:8888/api/gitlab/oauth",
             }
         },
         pro:{
@@ -96,7 +96,7 @@ angularApp.factory("config",function(){
             },
             gitlab:{
                 token:"http://gitlab.dockerdocs.cn/oauth/authorize",
-                client_id:"01841bc629e150c25d3eddffc23edc4092f86aad0c1d58fef67305a125ee2b90",
+                client_id:"85f65cd2239dcb49996e1eff34d375db40c2d8af7af2cbac17a2826ca3c1ebfc",
                 redirect_uri:"http://gitlab.dockerdocs.cn/api/gitlab/oauth",
             }
         }
@@ -112,8 +112,8 @@ angularApp.config(function($sceDelegateProvider) {
     'http://*.dockerdocs.cn/**',
     'http://*.docker.io/**',
     'http://*.docker.com/**',
-    'http://localhost:4000/**',   // gitbook
-    'http://localhost:10080/**',  // gitlab
-    'http://localhost:10081/**',  // gitlab ci
+    'http://www.dockerconsole.com:4000/**',   // gitbook
+    'http://www.dockerconsole.com:10080/**',  // gitlab
+    'http://www.dockerconsole.com:10081/**',  // gitlab ci
   ]);
 });

@@ -13,6 +13,7 @@ from util.oauth import GitLabOAuth2Mixin
 from services.oauth import OAuthService
 from services.service import ServiceService
 from services.application import ApplicationService
+from services.application_access import ApplicationAccessService
 from tornado.httputil import HTTPHeaders
 from tornado import gen
 from bson.objectid import ObjectId

@@ -22,7 +22,7 @@ class OAuthService():
         if user is None:
             raise gen.Return(None)
         else:
-            gitlab_token = user.get("gitlab_token",False)
+            gitlab_token = user.get("gitlab_token",None)
             if  gitlab_token:
                 raise gen.Return(gitlab_token)
             else:

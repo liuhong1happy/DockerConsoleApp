@@ -21,7 +21,7 @@ class Application(tornado.web.Application):
         from views.home import HomeHandler
         from views.service import ServicesHandler,ServiceInfoHandler,ServiceBuildHandler
         from views.login import LoginHandler,SigninHandler,SignupHandler,ForgetHandler
-        from views.oauth import GitLabOAuthHandler,GitLabTokenHandler
+        from views.oauth import GitLabOAuthHandler,GitLabTokenHandler,GitLabRefreshHanlder
         from views.application import ApplicationsHandler,ApplicationInfoHandler,ApplicationRunHandler,ApplicationAccessHandler
         handlers = [
              (r"/", HomeHandler),
@@ -37,7 +37,8 @@ class Application(tornado.web.Application):
              (r"/api/application/run",ApplicationRunHandler),
              (r"/api/application/access",ApplicationAccessHandler),
              (r"/api/gitlab/oauth",GitLabOAuthHandler),
-             (r"/api/gitlab/token",GitLabTokenHandler)
+             (r"/api/gitlab/token",GitLabTokenHandler),
+             (r"/api/gitlab/refresh",GitLabRefreshHanlder)
         ]
         _settings = dict(
             blog_title=u"Docker中文翻译社区",
