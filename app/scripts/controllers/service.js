@@ -21,13 +21,9 @@ function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,
     var getContainerInfo = function(){
         if($scope.service==null) $interval.cancel($scope.intervalId);
         
-        var project_name = $scope.service["project_name"];
-        var project_url = $scope.service["project_url"];
-        var storage_path = $scope.service["storage_path"];        
+        var application_id = $scope.service["application_id"];    
         ApplicationInfo.info(null,$.param({
-          "project_name":project_name,
-          "project_url":project_url,
-          "storage_path":storage_path
+          "application_id":application_id
         }),function(res){
           var run_status = res.data.status;
           var run_info = res.data.logs;
@@ -56,6 +52,8 @@ function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,
             var service = $scope.services[i];
             if(service.project_url==project_url){
               $scope.service = service;
+              
+              $scope.service["application_id"] = res.data["_id"];
               $scope.service["run_status"] = "查询过程中...";
               $scope.service["run_info"] = "查询过程中..."
               $scope.showScope = $scope.showList[1];

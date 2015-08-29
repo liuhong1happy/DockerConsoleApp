@@ -18,25 +18,25 @@ SITE_URL = 'http://www.dockerconsole.com:8888'
 TORNADO_PORT = 8888
 
 MONGO_POOL_ID = "DockerConsoleApp"
-MONGO_HOST = 'localhost'
+MONGO_HOST = '192.168.72.130'
 MONGO_PORT = 27017
 MONGO_DB = 'admin'
 MONGO_USER = 'mongo'
 MONGO_PWD = '123456'
 
-ETCD_HOST = 'www.dockerconsole.com'
+ETCD_HOST = '192.168.72.130'
 ETCD_PORT = 4001
 
 # discover host
-DISCOVER_HOST = 'www.dockerconsole.com'
+DISCOVER_HOST = '192.168.72.130'
 # docker host
 DOCKER_HOST = 'unix:///var/run/docker.sock'
 # docker registry 
-DOCKER_REGISTRY = "http://www.dockerconsole.com:5000"
+DOCKER_REGISTRY = "http://192.168.72.130:5000"
 # docker pull tag prefix (don't have string 'http://')
-DOCKER_TAGPREFIX = "www.dockerconsole.com:5000"
+DOCKER_TAGPREFIX = "192.168.72.130:5000"
 # docker start container
-CURRENT_HOST = 'www.dockerconsole.com'
+CURRENT_HOST = '192.168.72.130'
 
 MQ_HOST = 'www.dockerconsole.com'
 MQ_HEARTBEAT = 30
@@ -68,6 +68,6 @@ GITLAB_OAUTH = {
 }
 
 # redis 
-REDIS_HOST = 'www.dockerconsole.com'
+REDIS_HOST = '192.168.72.130'
 REDIS_PORT = '6379'
 REDIS_PASS = ''

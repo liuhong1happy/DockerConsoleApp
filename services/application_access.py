@@ -6,11 +6,13 @@ class ApplicationAccessService():
     
     @gen.coroutine
     def access_application(self,access,callback=None):
+        print "ccc"
+        print access
         access_id = access.get("access_id",None)
         model = {}
-	id = ""
+        id = ""
         if access_id is None:
-            model = yield self.m_application_access.insert_one(application)
+            model = yield self.m_application_access.insert_one(access)
             access_id = str(model.inserted_id)
         else:
             model = yield self.m_application_access.update_one({"_id":access_id},{"$set":access})

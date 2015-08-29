@@ -1,35 +1,39 @@
 from models.application import ApplicationModel
 from tornado import gen
+from bson.objectid import ObjectId
 
 class ApplicationService():
     m_application = ApplicationModel()
     
     @gen.coroutine
     def insert_application(self,application,callback=None):
-        project_url = application.get("project_url",None)
-        if project_url is None:
-            raise gen.Return(None)
-        app = yield self.m_application.find_one({"project_url":project_url})
+        application_id = application.get("application_id",None)
+        app = None
+        if application_id is not None:
+            application_id = ObjectId(application_id)
+            app = yield self.m_application.find_one(application_id)
         model = {}
         if app is None:
             model = yield self.m_application.insert_one(application)
             app = yield self.m_application.find_one(model.inserted_id)
+            application["_id"] = str(model.inserted_id)
         else:
-            model = yield self.m_application.update_one({"project_url":project_url},{"$set":application})
+            model = yield self.m_application.update_one(application_id,{"$set":application})
         raise gen.Return(application)
     
     @gen.coroutine
-    def exist_application(self,project_url,callback=None):
-        result = yield self.m_application.find_one({"project_url":project_url})
+    def exist_application(self,application_id,callback=None):
+        result = yield self.m_application.find_one(application_id)
         if result==None or not isinstance(result,dict):
             raise gen.Return(False)
         else:
             raise gen.Return(True)
     
     @gen.coroutine
-    def find_one(self,project_url,callback=None):
-        print project_url
-        result = yield self.m_application.find_one({"project_url":project_url})
+    def find_one(self,application_id,callback=None):
+        print application_id
+        application_id = ObjectId(application_id)
+        result = yield self.m_application.find_one(application_id)
         if result==None or not isinstance(result,dict):
             raise gen.Return(None)
         else:

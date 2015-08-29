@@ -5,6 +5,8 @@ class ApplicationModel(BaseModel):
     db = "console"
     
     fields={
+        "application_id":True,
+        "container_id":True,
         "project_url":True,
         "project_name":True,
         "storage_path":True,

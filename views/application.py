@@ -22,7 +22,6 @@ class ApplicationRunHandler(AsyncBaseHandler):
         user_id = str(self.current_user.get("_id",None))
         user_name = str(self.current_user.get("name",None))
         create_time = time.time()
-
         # 数据库操作
         insertData = {}
         insertData["project_url"] = project_url
@@ -31,9 +30,10 @@ class ApplicationRunHandler(AsyncBaseHandler):
         insertData["user_id"] = user_id
         insertData["status"] = 'created'
         insertData["logs"] = [{"create_time":create_time,"info":"started run application:"+project_name,"user_id":user_id}]
-        result= yield self.s_application.insert_application(insertData)
+        result = yield self.s_application.insert_application(insertData)
         # 加入队列
         msg = Message( json.dumps({
+            "application_id":result["_id"],
             "project_url":project_url,
             "project_name":project_name,
             "storage_path":storage_path,
@@ -46,7 +46,7 @@ class ApplicationRunHandler(AsyncBaseHandler):
         if result is None:
             self.render_error(error_code=404,msg="not data")
         else:
-            insertData["_id"] = str(result)
+            insertData["_id"] = result["_id"]
             self.write_result(data=insertData)
 
 class ApplicationInfoHandler(AsyncBaseHandler):
@@ -61,8 +61,8 @@ class ApplicationInfoHandler(AsyncBaseHandler):
     }
     @gen.coroutine
     def _post_(self):
-        project_url = self.get_argument("project_url",None)
-        app = yield self.s_application.find_one(project_url)
+        application_id = self.get_argument("application_id",None)
+        app = yield self.s_application.find_one(application_id)
         app["_id"] = str(app["_id"])
         if app is None:
             self.render_error(error_code=404,msg="not data")
@@ -89,6 +89,7 @@ class ApplicationsHandler(AsyncBaseHandler):
         page_size =int(self.get_argument("page_size",20))
         spec ={}
         spec[spec_type]={ '$regex' : spec_text}
+        spec["user_id"] = str(self.current_user.get("_id",None))
         applications =yield self.s_application.get_appliactions(spec,fields=self.fields,page_index=page_index,page_size=page_size)
         if not applications:
             self.render_error(error_code=404,msg="not data")
@@ -102,7 +103,7 @@ class ApplicationAccessHandler(AsyncBaseHandler):
     @gen.coroutine
     def _get_(self):
         access_id = self.get_argument("id",None)
-        access_info =     s_application_access.find_one(access_id)
+        access_info =  yield   s_application_access.find_one(access_id)
         if access_info is None:
             self.render_error(error_code=404,msg="not data")
         else:
@@ -111,9 +112,12 @@ class ApplicationAccessHandler(AsyncBaseHandler):
     @gen.coroutine
     def _post_(self):
         access_type = self.get_argument("type",None)
-        container_id = self.get_argument("id",None)
+        application_id = self.get_argument("id",None)
         access_content = self.get_argument("content","")
-        container_info = self.s_application.find_one(container_id)
+
+        container_info =yield self.s_application.find_one(application_id)
+        if container_info is None:
+            container_info = {}
         # 从数据库获取，切记不要对外公开
         container_host = container_info["run_host"]
         container_name = container_info["app_name"]
@@ -123,26 +127,27 @@ class ApplicationAccessHandler(AsyncBaseHandler):
         # 数据库操作
         accessData = {}
         accessData["access_type"] = access_type
-        accessData["container_id"] = container_id
+        accessData["application_id"] = application_id
         accessData["container_name"] = container_name
         accessData["container_host"] = container_host
-        accessData["access_content"] = container_content
+        accessData["access_content"] = access_content
         accessData["user_id"] = user_id
         accessData["status"] = 'start'
         accessData["logs"] = [
           {
             "create_time":create_time,
-            "info":"started access application:"+container_id+",it is hosted in "+container_host,
+            "info":"started access application:"+application_id+",it is hosted in "+container_host,
             "user_id":user_id
           }
         ]
         result= yield self.s_application_access.access_application(accessData)
+        print result
         # 加入队列
         msg = Message( json.dumps({
-            "access_id":result["_id"],
+            "access_id":result,
             "access_type":access_type,
             "access_content":access_content,
-            "container_id":container_id,
+            "application_id":application_id,
             "container_host":container_host,
             "container_name":container_name,
             "user_id":user_id,

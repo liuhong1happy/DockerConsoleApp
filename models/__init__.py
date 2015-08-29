@@ -25,9 +25,9 @@ class BaseModel():
     @return_future
     def get_list(self,spec,fields=None,sorts=None,skip=0,limit=20,callback=None):
         if(spec==None or not isinstance(spec,dict)):
-            spec = {"del_flag":{'$exists': 'False' }}
+            spec = {"del_flag":{'$ne': True }}
         else:
-            spec["del_flag"] = {'$exists': 'False' }
+            spec["del_flag"] = {'$ne': True }
         if(fields==None or not isinstance(fields,dict)):
             if not hasattr(self,"fields"):
                 fields = self.fields
@@ -37,7 +37,6 @@ class BaseModel():
             sorts = []
             sorts.append(("_id", pymongo.DESCENDING))
         result = []
-
         cursor = self.db_conn.find(filter = spec ,projection = fields,sort = sorts,limit = limit,skip = skip)
         
         for doc in cursor:
@@ -50,7 +49,7 @@ class BaseModel():
         if(spec_or_id==None):
             callback(None)
         if(isinstance(spec_or_id,dict)):
-            spec_or_id["del_flag"] = {'$exists': 'False' }
+            spec_or_id["del_flag"] = {'$ne':True }
             
         if(fields==None or not isinstance(fields,dict)):
             if hasattr(self,"fields"):
@@ -78,9 +77,9 @@ class BaseModel():
     def update_one(self, spec, document, callback=None):
         update_time = int(time.time())
         if spec==None or not isinstance(spec,dict):
-            spec = {"del_flag":{"$ne":'False'}}
+            spec = {"del_flag":{"$ne":True}}
         elif isinstance(spec,dict):
-            spec["del_flag"] = {"$ne":'False'}
+            spec["del_flag"] = {"$ne":True}
         else:
             callback(None)
         if document==None or not isinstance(spec,dict):
@@ -95,6 +94,7 @@ class BaseModel():
             document["$set"] = set_data
         else:
             callback(None)
+        print document
         result =self.db_conn.update_one(spec,document,upsert=False)
         callback(result)
         

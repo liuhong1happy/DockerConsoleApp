@@ -219,7 +219,7 @@ class BuildImage():
         fp.close()
         self.delete_tar_file(self._file_name)
         self._build_context["logs"].append({"info":u"构建镜像完成，开始push镜像" ,"user_id":self._user_id,"create_time":time.time()})
-        for line in cli.push( tag, stream=True,insecure_registry= settings.DOCKER_REGISTRY):
+        for line in cli.push( tag, stream=True,insecure_registry=True):
             # 写入数据库
             self._build_context["logs"].append({"info":line ,"user_id":self._user_id,"create_time":time.time()})
             self.update_database("running")
@@ -237,6 +237,7 @@ class StartContainer():
     
     def __init__(self,start_context):
         self._start_context = start_context
+        self._application_id = self._start_context["application_id"]
         self._storage_path = self._start_context["storage_path"]
         self._user_id = self._start_context["user_id"]
         self._project_url = self._start_context["project_url"]
@@ -251,7 +252,7 @@ class StartContainer():
     
     @gen.coroutine
     def pull_image(self):
-        application = yield self.s_application.find_one(self._project_url)
+        application = yield self.s_application.find_one(self._application_id)
         if application is None:
             return
         logs = application["logs"]
@@ -261,8 +262,9 @@ class StartContainer():
             logs = []
         self._start_context["logs"] = []
         cli = options.docker_client
+        print self._storage_path
         self._start_context["logs"].append({"info":"starting pull image:"+self._storage_path ,"user_id":self._user_id,"create_time":time.time()})
-        for line in cli.pull(self._storage_path,stream=True):
+        for line in cli.pull(self._storage_path,stream=True,insecure_registry=True):
             self._start_context["logs"].append({"info":line ,"user_id":self._user_id,"create_time":time.time()})
         
     def start_container(self):
@@ -275,6 +277,7 @@ class StartContainer():
             logging.info("can't find container")
         container = cli.create_container(image=self._storage_path,host_config=host_config,name=app_name)
         response = cli.start(container=app_name)
+        self._start_context["container_id"] = container["Id"]
         self._start_context["app_name"] = app_name
         self._start_context["run_host"] = settings.CURRENT_HOST 
         self.update_database("success")
@@ -286,53 +289,64 @@ class StartContainer():
 
 class AccessContainer():
     s_application_access = ApplicationAccessService()
+    s_application = ApplicationService()
     
-    def __init__(self,start_context):
+    def __init__(self,access_context):
         self._access_context = access_context
         self._user_id = self._access_context["user_id"]
         self._container_name = self._access_context["container_name"]
-        self._container_content = self._access_context["container_content"]
-        self._container_id = self._access_context["container_id"]
+        self._application_id = self._access_context["application_id"]
         self._user_name =  self._access_context["user_name"]
         self._access_type =  self._access_context["access_type"]
         self._access_content =  self._access_context["access_content"]
         
     def start_access_application(self):
         if(self._access_type=="restart"):
-          self.restart_container()
+            self.restart_container()
         if(self._access_type=="stop"):
-          self.stop_container()
+            self.stop_container()
         if(self._access_type=="delete"):
-          self.delete_container()
+            self.delete_container()
         if(self._access_type=="exec"):
-          self.exec_container()
+            self.exec_container()
     
-    def restart_container():
+    def restart_container(self):
         cli = options.docker_client
         response = cli.start(container=self._container_name)
         self._access_context["response"] = response
-        update_database("success")
+        self.update_database("success")
    
-    def stop_container():
+    def stop_container(self):
         cli = options.docker_client
         response = cli.stop(container=self._container_name)
         self._access_context["response"] = response
-        update_database("success")
+        self.update_database("success")
     
-    def delete_container():
+    def delete_container(self):
         cli = options.docker_client
-        response = cli.remove_container(container=self._container_name)
+        response = None
+        try:
+            response = cli.remove_container(container=self._container_name,force=True)
+        except Exception as e:
+            pass
         self._access_context["response"] = response
-        update_database("success")
+        self.update_database("success")
     
-    def exec_container():
+    def exec_container(self):
         cli = options.docker_client
-        exec_obj = cli.exec_create(container=self._container_name,cmd=self._container_content.slipt(' '))
+        exec_obj = cli.exec_create(container=self._container_name,cmd=self._access_content.slipt(' '))
         response = cli.exec_start(exec_id=exec_obj["Id"])
         self._access_context["response"] = response
-        update_database("success")
+        self.update_database("success")
         
     @gen.coroutine
     def update_database(self,status):
         self._access_context["status"] = status
+        result = {}
+        if(self._access_type == "delete"):
+            application = yield self.s_application.find_one(ObjectId(self._application_id))
+            application["del_flag"] = True
+            print application
+            delObj = yield self.s_application.insert_application(application)
         result = yield self.s_application_access.access_application(self._access_context)
+        print result
