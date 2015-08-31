@@ -16,6 +16,7 @@ DockerConsoleApp目前是由docker社区的爱好者[注：起源docker百度贴
 - 前端界面优化：更换碍眼的UI设计和色调 [`预计2015年10月1日前完成`]
 - 自动化测试：选择CI工具，对平台代码或者托管的代码库进行自动化测试
 - 自动化部署：借用webhooks或者自己开发web回调API接口实现自动化部署
+- 开辟SAAS：借助PAAS无缝对接[应用管理平台](https://github.com/liuhong1happy/CosoleWindowApp)。
 
 ## 未来版本规划
 
