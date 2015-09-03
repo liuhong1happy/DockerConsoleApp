@@ -293,13 +293,14 @@ class AccessContainer():
     
     def __init__(self,access_context):
         self._access_context = access_context
+        self._access_id = access_context["access_id"]
         self._user_id = self._access_context["user_id"]
         self._container_name = self._access_context["container_name"]
         self._application_id = self._access_context["application_id"]
         self._user_name =  self._access_context["user_name"]
         self._access_type =  self._access_context["access_type"]
         self._access_content =  self._access_context["access_content"]
-        
+
     def start_access_application(self):
         if(self._access_type=="restart"):
             self.restart_container()
@@ -309,16 +310,20 @@ class AccessContainer():
             self.delete_container()
         if(self._access_type=="exec"):
             self.exec_container()
+        if(self._access_type=="update"):
+            self.update_container()
     
     def restart_container(self):
         cli = options.docker_client
         response = cli.start(container=self._container_name)
+        self.update_application("restart")
         self._access_context["response"] = response
         self.update_database("success")
    
     def stop_container(self):
         cli = options.docker_client
         response = cli.stop(container=self._container_name)
+        self.update_application("stop")
         self._access_context["response"] = response
         self.update_database("success")
     
@@ -336,9 +341,32 @@ class AccessContainer():
         cli = options.docker_client
         exec_obj = cli.exec_create(container=self._container_name,cmd=self._access_content.slipt(' '))
         response = cli.exec_start(exec_id=exec_obj["Id"])
+        self.update_application("exec:"+self._access_content)
         self._access_context["response"] = response
         self.update_database("success")
         
+    def update_container(self):
+        cli = options.docker_client
+        self.update_application("update")
+        self._access_context["response"] = "update"
+        self.update_database("success")
+    
+    @gen.coroutine
+    def update_application(self,access):
+        cli = options.docker_client
+        response = cli.inspect_container(container=self._container_name)
+        application = {
+            "application_id":self._application_id,
+            "inspect_container":response,
+            "singleton":settings.SINGLETON,
+            "address_prefix": settings.DISCOVER_HOST if settings.SINGLETON else settins.DISCOVER_DOMAIN,
+            "last_access":access,
+            "last_access_id":self._access_id
+        }
+        application["update_result"] = yield self.s_application.insert_application(application)
+        
+
+    
     @gen.coroutine
     def update_database(self,status):
         self._access_context["status"] = status

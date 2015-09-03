@@ -12,6 +12,7 @@ class ApplicationModel(BaseModel):
         "storage_path":True,
         "app_name":True,
         "run_host":True,
+        "inspect_container":True,
         "user_id":True,
         "status":True,
         "logs":True,

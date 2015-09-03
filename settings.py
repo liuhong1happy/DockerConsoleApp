@@ -14,8 +14,15 @@ define("service_status", default={
         "success":2
     }, help="service status", type=dict)
 
+# 网站信息设定
 SITE_URL = 'http://www.dockerconsole.com:8888'
 TORNADO_PORT = 8888
+# 服务发现设置
+SINGLETON = True
+DISCOVER_HOST = '192.168.72.130'
+DISCOVER_DOMAIN = 's1.dockerconsole.com'
+ETCD_HOST = '192.168.72.130'
+ETCD_PORT = 4001
 
 MONGO_POOL_ID = "DockerConsoleApp"
 MONGO_HOST = '192.168.72.130'
@@ -24,11 +31,7 @@ MONGO_DB = 'admin'
 MONGO_USER = 'mongo'
 MONGO_PWD = '123456'
 
-ETCD_HOST = '192.168.72.130'
-ETCD_PORT = 4001
 
-# discover host
-DISCOVER_HOST = '192.168.72.130'
 # docker host
 DOCKER_HOST = 'unix:///var/run/docker.sock'
 # docker registry 
@@ -38,7 +41,7 @@ DOCKER_TAGPREFIX = "192.168.72.130:5000"
 # docker start container
 CURRENT_HOST = '192.168.72.130'
 
-MQ_HOST = 'www.dockerconsole.com'
+MQ_HOST = '192.168.72.130'
 MQ_HEARTBEAT = 30
 MQ_USERNAME = 'admin'
 MQ_PASSWORD = 'testpass'

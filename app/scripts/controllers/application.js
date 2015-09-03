@@ -18,7 +18,31 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess) {
                 "page_size":$scope.page_size
             },function(res){
                 if(res.status=="success"){
-                    $scope.applications = res.data;
+                    var applications =  res.data;
+                    for(var i=0;i<applications.length;i++){
+                        var application = applications[i];
+                        var ports = (application.inspect_container && application.inspect_container.NetworkSettings  && application.inspect_container.NetworkSettings.Ports)?application.inspect_container.NetworkSettings.Ports:[];
+                        var tPorts = [];
+                        for(var p in ports){
+                            if(ports[p] && ports[p].length>0){
+                                var tPort =  ports[p][0];
+                                tPort["PortAndType"] = p;
+                                tPorts.push(tPort)
+                            }
+                        }
+                        $window.console.log(tPorts);
+                        var urls = [];
+                        for(var j=0;j<tPorts.length;j++){
+                            var url = "http://"+(application.singleton?"":application.user_name+"-"+application.project_name+".")+application.address_prefix+":"+tPorts[j].HostPort;
+                            urls.push({
+                                "PortAndType":tPorts[j].PortAndType,
+                                "PortUrl":url
+                            });
+                        }
+                        $window.console.log(urls);
+                        applications[i]["urls"] = urls;
+                    }
+                    $scope.applications = applications;
                 }else{
                     alert('数据为空');
                 }

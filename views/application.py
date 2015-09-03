@@ -51,14 +51,6 @@ class ApplicationRunHandler(AsyncBaseHandler):
 
 class ApplicationInfoHandler(AsyncBaseHandler):
     s_application = ApplicationService()
-    fields={
-        "project_url":True,
-        "project_name":True,
-        "app_name":True,
-        "user_id":True,
-        "status":True,
-        "logs":True
-    }
     @gen.coroutine
     def _post_(self):
         application_id = self.get_argument("application_id",None)
@@ -76,10 +68,15 @@ class ApplicationsHandler(AsyncBaseHandler):
         "project_name":True,
         "app_name":True,
         "user_id":True,
+        "user_name":True,
         "status":True,
         "logs":True,
         "update_time":True,
-        'create_time':True
+        'create_time':True,
+        "run_host":True,
+        "inspect_container":True,
+        "address_prefix":True,
+        "singleton":True
     }
     @gen.coroutine
     def _get_(self):
