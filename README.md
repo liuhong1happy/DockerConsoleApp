@@ -20,8 +20,8 @@ DockerConsoleApp目前是由docker社区的爱好者[注：起源docker百度贴
 
 ## 未来版本规划
 
-1.x 一键部署
-2.x web api
+- 1.x 一键部署
+- 2.x web api
 
 ## 技术列表
 
@@ -44,9 +44,13 @@ DockerConsoleApp目前是由docker社区的爱好者[注：起源docker百度贴
 
 请参考[wiki](https://github.com/liuhong1happy/DockerConsoleApp/wiki)，此处略！
 
+## 运行界面
+
+![](app/images/applications.png)
+
 ## 联系我们
 
-如果你有Issues可以提交PR给我们。
+如果你有Issues可以提交给我们。
 
 如果你想进一步了解我们的开发进度和计划，或者想商业化我们的开源项目，请参见如下联系方式：
 
