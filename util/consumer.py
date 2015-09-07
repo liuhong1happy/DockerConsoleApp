@@ -135,13 +135,11 @@ class BuildImage():
         t = tarfile.open(tar_file)
         t.extractall(path = arcpath) 
         t.close()
-        print arcpath,tar_file,content_path
         self.delete_tar_file(tar_file)
         tz = tarfile.open(new_tar_file, "w:gz")
         for root, dir, files in os.walk(arcpath):
             for file in files:
                 fullpath = os.path.join(root, file)
-                print fullpath,file
                 tz.add(fullpath,arcname=file)
         tz.close()
         return new_tar_file
@@ -206,15 +204,27 @@ class BuildImage():
             return
         project_name = self._build_context.get("project_name",None)
         self._file_name = self.get_tar_file("/tmp/build_image/"+project_name+"-"+self._md5,"/tmp/build_image/"+project_name+"-"+self._md5+".tar",project_name+".git")
-        print self._file_name
         self._build_context["logs"].append({"info":u"获取附件完成，开始构建镜像" ,"user_id":self._user_id,"create_time":time.time()})
         cli = options.docker_client
         fp = open(self._file_name,"r")
         tag = settings.DOCKER_TAGPREFIX +"/"+self._user_name+"/"+project_name
         self._build_context["storage_path"] = tag
-        for line in cli.build(fileobj=fp, rm=True, tag=tag,custom_context=True,forcerm=True):
+        import json
+        for line in cli.build(fileobj=fp, rm=True, tag=tag,custom_context=True,forcerm=True,pull=False):
+            newLine = json.loads(line)
+            newLog = {"info":newLine ,"user_id":self._user_id,"create_time":time.time()}
+            if(isinstance(self._build_context["logs"][-1]["info"],dict)):
+                status = self._build_context["logs"][-1]["info"].get("status",None)
+                print status,newLine.get("status",None),status == newLine.get("status",None)
+                if status is None:
+                    self._build_context["logs"].append(newLog)
+                elif status == newLine.get("status",None):
+                    self._build_context["logs"][-1] = newLog
+                else:
+                    self._build_context["logs"].append(newLog)
+            else:
+                self._build_context["logs"].append(newLog)
             # 写入数据库
-            self._build_context["logs"].append({"info":line ,"user_id":self._user_id,"create_time":time.time()})
             self.update_database("running")
         fp.close()
         self.delete_tar_file(self._file_name)
@@ -262,7 +272,6 @@ class StartContainer():
             logs = []
         self._start_context["logs"] = []
         cli = options.docker_client
-        print self._storage_path
         self._start_context["logs"].append({"info":"starting pull image:"+self._storage_path ,"user_id":self._user_id,"create_time":time.time()})
         for line in cli.pull(self._storage_path,stream=True,insecure_registry=True):
             self._start_context["logs"].append({"info":line ,"user_id":self._user_id,"create_time":time.time()})
@@ -370,11 +379,14 @@ class AccessContainer():
     @gen.coroutine
     def update_database(self,status):
         self._access_context["status"] = status
+        
         result = {}
         if(self._access_type == "delete"):
             application = yield self.s_application.find_one(ObjectId(self._application_id))
+            application["application_id"] = self._application_id
+            
+            logging.info(self._application_id)
+            logging.info(application["_id"])
             application["del_flag"] = True
-            print application
             delObj = yield self.s_application.insert_application(application)
         result = yield self.s_application_access.access_application(self._access_context)
-        print result

@@ -6,8 +6,6 @@ class ApplicationAccessService():
     
     @gen.coroutine
     def access_application(self,access,callback=None):
-        print "ccc"
-        print access
         access_id = access.get("access_id",None)
         model = {}
         id = ""

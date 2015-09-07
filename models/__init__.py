@@ -94,7 +94,6 @@ class BaseModel():
             document["$set"] = set_data
         else:
             callback(None)
-        print document
         result =self.db_conn.update_one(spec,document,upsert=False)
         callback(result)
         

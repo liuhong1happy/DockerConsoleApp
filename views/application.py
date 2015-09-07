@@ -138,7 +138,6 @@ class ApplicationAccessHandler(AsyncBaseHandler):
           }
         ]
         result= yield self.s_application_access.access_application(accessData)
-        print result
         # 加入队列
         msg = Message( json.dumps({
             "access_id":result,

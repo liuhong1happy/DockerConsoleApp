@@ -18,7 +18,7 @@ class ApplicationService():
             app = yield self.m_application.find_one(model.inserted_id)
             application["_id"] = str(model.inserted_id)
         else:
-            model = yield self.m_application.update_one(application_id,{"$set":application})
+            model = yield self.m_application.update_one({ "_id":application_id},{"$set":application})
         raise gen.Return(application)
     
     @gen.coroutine
@@ -31,7 +31,6 @@ class ApplicationService():
     
     @gen.coroutine
     def find_one(self,application_id,callback=None):
-        print application_id
         application_id = ObjectId(application_id)
         result = yield self.m_application.find_one(application_id)
         if result==None or not isinstance(result,dict):
