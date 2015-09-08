@@ -1,6 +1,6 @@
 <div class="row details-header">
-    <h2>代码构建</h2>
-    <p>我们需要自动化去部署代码，必然会面临代码构建成容器镜像，本步骤即为构建镜像</p>
+    <h2>服务管理</h2>
+    <p>我们需要自动化去部署代码，必然会面临代码构建成容器镜像，本步骤即为构建的镜像</p>
     <hr />
 </div>
 <div class="details-body">
@@ -23,7 +23,10 @@
             <td>[[service.status]]</td>
             <td>[[service.project_name]]</td>
             <td>[[(service.update_time?service.update_time:service.create_time)*1000 | date:"yyyy-MM-dd hh:mm:ss"]]</td>
-            <td><a class="btn btn-success" ng-click="create_application(service.project_name,service.project_url,service.storage_path)">创建任务</a></td>
+            <td>
+                <a class="btn btn-success" ng-click="create_application(service.project_name,service.project_url,service.storage_path)">创建任务</a>
+                <a class="btn btn-success" ng-click="application_logs(service.project_name)">查看日志</a>
+            </td>
         </tr>
     </tbody>
     </table>
@@ -32,7 +35,7 @@
     <h2>[[service.project_name]]</h2>
     <p>[[service.project_url]]</p>
     <p>[[service.run_status]]</p>
-    <a ng-click="showServices()">返回</a>
+    <a  class="btn btn-success" ng-click="showServices()">返回</a>
     <hr />
     </div>
     <div class="row" ng-show="showScope=='service'">
@@ -43,6 +46,23 @@
         </li>
     </ul>
     </div>
+    </div>
+    <div  class="row" ng-show="showScope=='project'">
+        <h2>[[project.project_name]]</h2>
+        <p>[[project.project_url]]</p>
+        <p>[[project.build_status]]</p>
+        <a  class="btn btn-success" ng-click="showServices()">返回</a>
+        <a  class="btn btn-success" ng-click="getImageInfo()">刷新</a>
+        <hr />
+    </div>
+    <div class="row" ng-show="showScope=='project'">
+        <div class="build-info">
+            <ul>
+                <li ng-repeat="info in project.build_info">
+                    <p>[[info.info]]</p>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
 

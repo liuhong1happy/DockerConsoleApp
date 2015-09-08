@@ -90,7 +90,6 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Gi
           $scope.project["build_status"] = build_status;
           $scope.project["build_info"] = build_info;
           if(build_status=="success"){
-             $window.console.log($scope.intervalId);
              $interval.cancel($scope.intervalId);
              $scope.intervalId = null;
           }

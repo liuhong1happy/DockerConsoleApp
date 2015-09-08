@@ -29,7 +29,7 @@ class ServiceBuildHandler(AsyncBaseHandler):
         insertData["project_id"] = project_id
         insertData["user_id"] = user_id
         insertData["status"] = 'created'
-        insertData["logs"] = [{"create_time":create_time,"info":"started build project:"+project_name,"user_id":user_id}]
+        insertData["logs"] = [{"create_time":create_time,"info":'{"stream":"started build project:'+project_name+'"}',"user_id":user_id}]
         result= yield self.s_service.insert_service(insertData)
         # 加入队列
         msg = Message( json.dumps({

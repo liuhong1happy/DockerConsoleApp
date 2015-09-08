@@ -201,3 +201,16 @@ a:focus,a:hover{
       height: 980px;
     }
   }
+
+.build-info{
+        background: #000;
+        max-height: 500px;
+        overflow-y: scroll;
+        padding: 6px;
+        box-shadow: 0px 0px 1px #333;
+}
+
+.build-info ul{
+        list-style: none;
+        padding-left: 0px;
+}

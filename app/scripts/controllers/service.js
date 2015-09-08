@@ -7,12 +7,12 @@
  * # CicdCtrl
  * Controller of the angularApp
  */
-angularApp.controller('ServiceCtrl', ["$scope","config","Services","Service","ApplicationRun","ApplicationInfo","$window","$interval","$timeout", 
-function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,$interval,$timeout) {
+angularApp.controller('ServiceCtrl', ["$scope","config","Services","Service","ServiceInfo","ApplicationRun","ApplicationInfo","$window","$interval","$timeout", 
+function ($scope,config,Services,Service,ServiceInfo,ApplicationRun,ApplicationInfo,$window,$interval,$timeout) {
     $scope.page_index = 0;
     $scope.page_size = 20;
     $scope.services = [];
-    $scope.showList  = ["list","service"]
+    $scope.showList  = ["list","service","project"]
     $scope.showScope = $scope.showList[0];
     $scope.application_name = "";
     $scope.project_url = "";
@@ -71,9 +71,40 @@ function ($scope,config,Services,Service,ApplicationRun,ApplicationInfo,$window,
       })
     }
     $scope.showServices = function(){
-      $scope.showScope = $scope.showList[0];;
-      $scope.service = null;
+        $scope.showScope = $scope.showList[0];;
+        $scope.service = null;
+        
     }
+    $scope.getImageInfo = function(){
+        var project_name = $scope.project["project_name"];
+        var project_url = $scope.project["project_url"];
+        var project_id = $scope.project["project_id"];        
+        ServiceInfo.info(null,$.param({
+          "project_name":project_name,
+          "project_url":project_url,
+          "project_id":project_id
+        }),function(res){
+            var build_status = res.data.status;
+            var build_info = res.data.logs;
+            $scope.project["build_status"] = build_status;
+            $scope.project["build_info"] = build_info;
+            $window.console.log(build_info);
+        },function(e,err){
+          $scope.project["build_status"] = "抱歉，网络原因无法得知当前状态";
+          $scope.project["build_info"] = "抱歉,网络原因无法更新日志";
+        });
+    }
+    $scope.application_logs = function(project_name){
+        for(var i=0;i<$scope.services.length;i++){
+            if($scope.services[i].project_name == project_name){
+                  $scope.project = $scope.services[i];
+                  $scope.showScope = $scope.showList[2];
+                  $scope.getImageInfo();
+            }
+        }
+    }
+    
+    
     $timeout(function () {
             Services.read({
                 "page_index":$scope.page_index,
