@@ -138,24 +138,7 @@ function ($scope,config,Services,Service,ServiceInfo,ApplicationRun,ApplicationI
             }
     };
 }]);
-angularApp.factory('Services',["$resource",function($resource){
-    return $resource('/api/services',{},{
-        read:{
-            method:"GET",
-            isArray:false
-        }
-    });
-}]);
-angularApp.factory('Service',["$resource",function($resource){
 
-    return $resource('/api/service',{
-    },{
-        "submit":{
-            method:"POST",
-            isArray:false
-        }
-    });
-}]);
 angularApp.factory('ApplicationRun',["$resource",function($resource){
     return $resource('/api/application/run',null,{
         "run":{
