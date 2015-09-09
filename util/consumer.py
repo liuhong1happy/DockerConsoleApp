@@ -173,10 +173,10 @@ class BuildImage():
         project_id = self._build_context.get("project_id",None)
         self._archive_url = '/api/v3/projects/'+project_id+'/repository/archive'
         # 记录操作日志
-        self._build_context["logs"].append({"info":u'{"stream":"save project master branch\'s archive file to special path：'+self._file_name+'"}',"user_id":self._user_id,"create_time":time.time()})
-        self._build_context["logs"].append({"info":u'{"stream":"get current user\'s access_token：'+self._access_token+'"}',"user_id":self._user_id,"create_time":time.time()})
-        self._build_context["logs"].append({"info":u'{"stream":"get archive url：'+self._archive_url+'"}' ,"user_id":self._user_id,"create_time":time.time()})
-        self._build_context["logs"].append({"info":u'{"stream":"from '+self._archive_url+u' start to get master branch\'s archive"}',"user_id":self._user_id,"create_time":time.time()})
+        self._build_context["logs"].append({"info":{"stream":u"save project master branch's archive file to special path："+self._file_name},"user_id":self._user_id,"create_time":time.time()})
+        self._build_context["logs"].append({"info":{"stream":u"get current user's access_token："+self._access_token},"user_id":self._user_id,"create_time":time.time()})
+        self._build_context["logs"].append({"info":{"stream":u"get archive url："+self._archive_url },"user_id":self._user_id,"create_time":time.time()})
+        self._build_context["logs"].append({"info":{"stream":"from"+self._archive_url+u" start to get master branch's archive"},"user_id":self._user_id,"create_time":time.time()})
         self.update_database("running")
         # 开始获取代码并开始构建
         http = AsyncHTTPClient()
@@ -192,7 +192,7 @@ class BuildImage():
             
     # 保存代码到文件系统
     def save_tar_file(self,blob):
-        self._build_context["logs"].append({"info": u'{"stream":"from '+self._archive_url+' got archive '+str(len(blob))+'B file data"}' ,"user_id":self._user_id,"create_time":time.time()})
+        self._build_context["logs"].append({"info": {"stream":"from "+self._archive_url+" got archive "+str(len(blob))+"B file data" } ,"user_id":self._user_id,"create_time":time.time()})
         WriteFileData = open(self._file_name,'ab')
         WriteFileData.write(blob)
         WriteFileData.close()
@@ -204,7 +204,7 @@ class BuildImage():
             return
         project_name = self._build_context.get("project_name",None)
         self._file_name = self.get_tar_file("/tmp/build_image/"+project_name+"-"+self._md5,"/tmp/build_image/"+project_name+"-"+self._md5+".tar",project_name+".git")
-        self._build_context["logs"].append({"info":u'{"stream":"got archive,start to build image"}' ,"user_id":self._user_id,"create_time":time.time()})
+        self._build_context["logs"].append({"info":{"stream":"got archive,start to build image"} ,"user_id":self._user_id,"create_time":time.time()})
         cli = options.docker_client
         fp = open(self._file_name,"r")
         tag = settings.DOCKER_TAGPREFIX +"/"+self._user_name+"/"+project_name
@@ -228,7 +228,7 @@ class BuildImage():
             self.update_database("running")
         fp.close()
         self.delete_tar_file(self._file_name)
-        self._build_context["logs"].append({"info": u'{"stream":"build image,start to push image"}' ,"user_id":self._user_id,"create_time":time.time()})
+        self._build_context["logs"].append({"info": {"stream":"build image,start to push image"} ,"user_id":self._user_id,"create_time":time.time()})
         for line in cli.push( tag, stream=True,insecure_registry=True):
             # 写入数据库
             self._build_context["logs"].append({"info":line ,"user_id":self._user_id,"create_time":time.time()})

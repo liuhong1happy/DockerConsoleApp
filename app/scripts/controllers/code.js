@@ -7,8 +7,8 @@
  * # CodeCtrl
  * Controller of the angularApp
  */
-angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","GitLabRefresh","ServiceBuild","ServiceInfo","$interval", 
-  function ($scope,config,$window,GitLabToken,GitLabRefresh,ServiceBuild,ServiceInfo,$interval) {
+angularApp.controller('CodeCtrl', ["$scope","config","Util","$window","GitLabToken","GitLabRefresh","ServiceBuild","ServiceInfo","$interval", 
+  function ($scope,config,Util,$window,GitLabToken,GitLabRefresh,ServiceBuild,ServiceInfo,$interval) {
       
      var getTokenByApi = function(){
         $window.console.log("get-token");
@@ -81,18 +81,21 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Gi
         var project_url = $scope.project["web_url"];
         var project_id = $scope.project["id"];        
         ServiceInfo.info(null,$.param({
-          "project_name":project_name,
-          "project_url":project_url,
-          "project_id":project_id
+           "project_name":project_name,
+           "project_url":project_url,
+           "project_id":project_id
         }),function(res){
-          var build_status = res.data.status;
-          var build_info = res.data.logs;
-          $scope.project["build_status"] = build_status;
-          $scope.project["build_info"] = build_info;
-          if(build_status=="success"){
-             $interval.cancel($scope.intervalId);
-             $scope.intervalId = null;
-          }
+            var build_status = res.data.status;
+            var build_info = res.data.logs;
+            for(var i=0;i<build_info.length;i++){
+                 build_info[i].log = Util.FormatLog(build_info[i].info);
+            }
+            $scope.project["build_status"] = build_status;
+            $scope.project["build_info"] = build_info;
+            if(build_status=="success"){
+                $interval.cancel($scope.intervalId);
+                $scope.intervalId = null;
+            }
         },function(e,err){
           $interval.cancel($scope.intervalId);
           $scope.intervalId = null;

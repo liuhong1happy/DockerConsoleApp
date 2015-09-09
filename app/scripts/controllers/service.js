@@ -7,8 +7,8 @@
  * # CicdCtrl
  * Controller of the angularApp
  */
-angularApp.controller('ServiceCtrl', ["$scope","config","Services","Service","ServiceInfo","ApplicationRun","ApplicationInfo","$window","$interval","$timeout", 
-function ($scope,config,Services,Service,ServiceInfo,ApplicationRun,ApplicationInfo,$window,$interval,$timeout) {
+angularApp.controller('ServiceCtrl', ["$scope","config","Util","Services","Service","ServiceInfo","ApplicationRun","ApplicationInfo","$window","$interval","$timeout", 
+function ($scope,config,Util,Services,Service,ServiceInfo,ApplicationRun,ApplicationInfo,$window,$interval,$timeout) {
     $scope.page_index = 0;
     $scope.page_size = 20;
     $scope.services = [];
@@ -86,6 +86,9 @@ function ($scope,config,Services,Service,ServiceInfo,ApplicationRun,ApplicationI
         }),function(res){
             var build_status = res.data.status;
             var build_info = res.data.logs;
+            for(var i=0;i<build_info.length;i++){
+                build_info[i].log = Util.FormatLog(build_info[i].info);
+            }
             $scope.project["build_status"] = build_status;
             $scope.project["build_info"] = build_info;
             $window.console.log(build_info);
