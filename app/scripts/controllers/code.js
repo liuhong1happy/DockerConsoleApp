@@ -185,21 +185,3 @@ angularApp.factory('GitLabRefresh',["$resource",function($resource){
         }
     });
 }]);
-
-angularApp.factory('ServiceBuild',["$resource",function($resource){
-    return $resource('/api/service/build',null,{
-        "build":{
-            method:"post",
-            isArray:false
-        }
-    });
-}]);
-
-angularApp.factory('ServiceInfo',["$resource",function($resource){
-    return $resource('/api/service/info',null,{
-        "info":{
-            method:"post",
-            isArray:false
-        }
-    });
-}]);
