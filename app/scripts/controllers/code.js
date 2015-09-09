@@ -167,21 +167,3 @@ angularApp.controller('CodeCtrl', ["$scope","config","$window","GitLabToken","Gi
     // 获取gitlab项目信息
     getTokenByApi();
 }]);
-
-angularApp.factory('GitLabToken',["$resource",function($resource){
-    return $resource('/api/gitlab/token',null,{
-        "getToken":{
-            method:"get",
-            isArray:false
-        }
-    });
-}]);
-      
-angularApp.factory('GitLabRefresh',["$resource",function($resource){
-    return $resource('/api/gitlab/refresh',null,{
-        "refresh":{
-            method:"get",
-            isArray:false
-        }
-    });
-}]);
