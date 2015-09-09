@@ -14,3 +14,24 @@ angularApp.factory('ApplicationInfo',["$resource",function($resource){
         }
     });
 }]);
+
+angularApp.factory('Applications',["$resource",function($resource){
+    return $resource('/api/applications',{},{
+        read:{
+            method:"GET",
+            isArray:false
+        }
+    });
+}]);
+angularApp.factory('ApplicationAccess',["$resource",function($resource){
+    return $resource('/api/application/access',null,{
+        "start":{
+            method:"POST",
+            isArray:false
+        },
+        "find":{
+            method:"GET",
+            isArray:false
+        }
+    });
+}]);
