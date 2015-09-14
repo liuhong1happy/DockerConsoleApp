@@ -1,6 +1,5 @@
 from models.user  import UserModel
 from util.genmd5 import genmd5
-from bson.objectid import ObjectId
 from tornado import gen
 from tornado.concurrent import return_future
 
