@@ -53,12 +53,14 @@ class BaseModel():
     def find_one(self,spec_or_id,fields=None,callback=None):
         if(spec_or_id==None):
             callback(None)
+            
         if(isinstance(spec_or_id,dict)):
             spec_or_id["del_flag"] = {'$ne':True }
             spec_id = spec_or_id.get("_id",None)
-            if spec_id is not None and isinstance(spec_id,str):
+            if spec_id is not None and ( isinstance(spec_id,unicode) or  isinstance(spec_id,str)):
                 spec_or_id["_id"] = ObjectId(spec_id)
-        if(isinstance(spec_or_id,str)):
+
+        if(isinstance(spec_or_id,unicode) or isinstance(spec_or_id,str)):
             spec_or_id = ObjectId(spec_or_id)
         if(fields==None or not isinstance(fields,dict)):
             if hasattr(self,"fields"):
@@ -88,6 +90,9 @@ class BaseModel():
         if spec==None or not isinstance(spec,dict):
             spec = {"del_flag":{"$ne":True}}
         elif isinstance(spec,dict):
+            spec_id = spec.get("_id",None)
+            if spec_id is not None and ( isinstance(spec_id,unicode) or  isinstance(spec_id,str)):
+                spec["_id"] = ObjectId(spec_id)
             spec["del_flag"] = {"$ne":True}
         else:
             callback(None)

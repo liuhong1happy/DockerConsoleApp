@@ -116,8 +116,10 @@ class ApplicationAccessHandler(AsyncBaseHandler):
         if container_info is None:
             container_info = {}
         # 从数据库获取，切记不要对外公开
-        container_host = container_info["run_host"]
-        container_name = container_info["app_name"]
+        container_host = container_info.get("run_host",None)
+        container_name = container_info.get("app_name",None)
+        if container_host is None or container_name is None:
+            self.render_error(error_code=404,msg="not success")
         user_id = str(self.current_user.get("_id",None))
         user_name = str(self.current_user.get("name",None))
         create_time = time.time()

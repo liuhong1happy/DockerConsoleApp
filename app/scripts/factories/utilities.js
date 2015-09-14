@@ -19,6 +19,9 @@ angularApp.factory('Util', ["$window",function($window) {
         }
         result = Log.status+" "+percent+" "+Log.progress;
       }
+     if(Log.status){
+         result = Log.status;
+     }
       return result;
     }
   };

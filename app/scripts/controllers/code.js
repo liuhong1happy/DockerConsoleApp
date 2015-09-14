@@ -73,7 +73,7 @@ angularApp.controller('CodeCtrl', ["$scope","config","Util","$window","GitLabTok
     
     $scope.intervalId = null;
     $scope.getImageInfo = function(){
-        if($scope.intervalId==null){
+        if($scope.intervalId==null||$scope.project==null){
             return;
         }
         
@@ -85,6 +85,7 @@ angularApp.controller('CodeCtrl', ["$scope","config","Util","$window","GitLabTok
            "project_url":project_url,
            "project_id":project_id
         }),function(res){
+            
             var build_status = res.data.status;
             var build_info = res.data.logs;
             for(var i=0;i<build_info.length;i++){

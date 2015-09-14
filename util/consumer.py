@@ -16,7 +16,6 @@ from services.application import ApplicationService
 from services.application_access import ApplicationAccessService
 from tornado.httputil import HTTPHeaders
 from tornado import gen
-from bson.objectid import ObjectId
 import md5
 import time
 import random
@@ -98,6 +97,7 @@ def create_service(msg):
     msg.ack()
 
 def run_application(msg):
+def run_application(msg):
     start_context = json.loads(msg.body)
     builder = StartContainer(start_context)
     builder.start_run_application()
@@ -118,7 +118,7 @@ class BuildImage():
     @gen.coroutine
     def get_access_token(self,user_id):
         s_oauth = OAuthService()
-        token = yield s_oauth.get_gitlab_token(ObjectId(user_id))
+        token = yield s_oauth.get_gitlab_token(user_id)
         raise gen.Return(token)
     
     # 随机生产md5加密的hash码
@@ -215,7 +215,6 @@ class BuildImage():
             newLog = {"info":newLine ,"user_id":self._user_id,"create_time":time.time()}
             if(isinstance(self._build_context["logs"][-1]["info"],dict)):
                 status = self._build_context["logs"][-1]["info"].get("status",None)
-                print status,newLine.get("status",None),status == newLine.get("status",None)
                 if status is None:
                     self._build_context["logs"].append(newLog)
                 elif status == newLine.get("status",None):
@@ -231,7 +230,8 @@ class BuildImage():
         self._build_context["logs"].append({"info": {"stream":"build image,start to push image"} ,"user_id":self._user_id,"create_time":time.time()})
         for line in cli.push( tag, stream=True,insecure_registry=True):
             # 写入数据库
-            self._build_context["logs"].append({"info":line ,"user_id":self._user_id,"create_time":time.time()})
+            newLine = json.loads(line)
+            self._build_context["logs"].append({"info":newLine ,"user_id":self._user_id,"create_time":time.time()})
             self.update_database("running")
         self.update_database("success")
         
@@ -275,6 +275,7 @@ class StartContainer():
         self._start_context["logs"].append({"info":"starting pull image:"+self._storage_path ,"user_id":self._user_id,"create_time":time.time()})
         for line in cli.pull(self._storage_path,stream=True,insecure_registry=True):
             self._start_context["logs"].append({"info":line ,"user_id":self._user_id,"create_time":time.time()})
+            self.update_database("success")
         
     def start_container(self):
         host_config = create_host_config(publish_all_ports=True,restart_policy={'Name':'always'})
@@ -382,11 +383,8 @@ class AccessContainer():
         
         result = {}
         if(self._access_type == "delete"):
-            application = yield self.s_application.find_one(ObjectId(self._application_id))
+            application = yield self.s_application.find_one(self._application_id)
             application["application_id"] = self._application_id
-            
-            logging.info(self._application_id)
-            logging.info(application["_id"])
             application["del_flag"] = True
             delObj = yield self.s_application.insert_application(application)
         result = yield self.s_application_access.access_application(self._access_context)
