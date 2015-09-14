@@ -25,10 +25,14 @@ class BaseModel():
 
     @return_future
     def get_list(self,spec,fields=None,sorts=None,skip=0,limit=20,callback=None):
-        if(spec==None or not isinstance(spec,dict)):
+        if(spec is None or not isinstance(spec,dict)):
             spec = {"del_flag":{'$ne': True }}
         else:
             spec["del_flag"] = {'$ne': True }
+            spec_id = spec.get("_id",None)
+            if spec_id is not None and isinstance(spec_id,str):
+                spec["_id"] = ObjectId(spec_id)
+        
         if(fields==None or not isinstance(fields,dict)):
             if not hasattr(self,"fields"):
                 fields = self.fields
@@ -51,6 +55,9 @@ class BaseModel():
             callback(None)
         if(isinstance(spec_or_id,dict)):
             spec_or_id["del_flag"] = {'$ne':True }
+            spec_id = spec_or_id.get("_id",None)
+            if spec_id is not None and isinstance(spec_id,str):
+                spec_or_id["_id"] = ObjectId(spec_id)
         if(isinstance(spec_or_id,str)):
             spec_or_id = ObjectId(spec_or_id)
         if(fields==None or not isinstance(fields,dict)):
