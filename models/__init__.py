@@ -1,8 +1,9 @@
-import settings
+import tornado.web
 from tornado.options import define,options
 from tornado import gen
 from tornado.concurrent import return_future
-import tornado.web
+from bson.objectid import ObjectId
+import settings
 import pymongo
 import logging
 import time
@@ -50,7 +51,8 @@ class BaseModel():
             callback(None)
         if(isinstance(spec_or_id,dict)):
             spec_or_id["del_flag"] = {'$ne':True }
-            
+        if(isinstance(spec_or_id,str)):
+            spec_or_id = ObjectId(spec_or_id)
         if(fields==None or not isinstance(fields,dict)):
             if hasattr(self,"fields"):
                 fields = self.fields
