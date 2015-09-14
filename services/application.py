@@ -1,6 +1,5 @@
 from models.application import ApplicationModel
 from tornado import gen
-from bson.objectid import ObjectId
 
 class ApplicationService():
     m_application = ApplicationModel()
@@ -10,7 +9,6 @@ class ApplicationService():
         application_id = application.get("application_id",None)
         app = None
         if application_id is not None:
-            application_id = ObjectId(application_id)
             app = yield self.m_application.find_one(application_id)
         model = {}
         if app is None:
@@ -31,7 +29,6 @@ class ApplicationService():
     
     @gen.coroutine
     def find_one(self,application_id,callback=None):
-        application_id = ObjectId(application_id)
         result = yield self.m_application.find_one(application_id)
         if result==None or not isinstance(result,dict):
             raise gen.Return(None)
