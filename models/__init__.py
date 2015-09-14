@@ -8,7 +8,7 @@ import pymongo
 import logging
 import time
 
-__all__=["get_list","get_one","update","insert","delete","exsit","count"]
+__all__=["get_list","find_one","update_one","insert_one"]
 
 class BaseModel():
     def __init__(self):
