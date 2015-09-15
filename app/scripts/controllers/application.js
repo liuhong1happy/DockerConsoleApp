@@ -12,6 +12,7 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess) {
     $scope.page_index = 0;
     $scope.page_size = 20;
     $scope.applications = [];
+    $scope.exec_logs = [];
     $scope.showList  = ["list","service","application","exec"]
     $scope.showScope = $scope.showList[0];
     $timeout(function () {
@@ -87,6 +88,16 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess) {
       // 切换视图
       $scope.showScope = $scope.showList[2];
     }
+    $scope.append_exec_logs = function(content){
+      if(content==""){
+        $scope.exec_logs.push("");
+      }else{
+        // 和后台进行交互获取日志
+        
+        // 将结果呈现在界面上
+        $scope.exec_logs.push(content);
+      }
+    }
     $scope.show_exec = function(_id){
       // 查找application
       var findArr = $scope.applications.filter(function(item,index){
@@ -94,6 +105,8 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess) {
       });
       if(findArr.length>=1){
         $scope.application = findArr[0];
+        // 清空交互日志
+        $scope.exec_logs = [];
         // 切换视图
         $scope.showScope = $scope.showList[2];
       }else{
