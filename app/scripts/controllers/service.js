@@ -25,17 +25,20 @@ function ($scope,config,Util,Services,Service,ServiceInfo,ApplicationRun,Applica
         ApplicationInfo.info(null,$.param({
           "application_id":application_id
         }),function(res){
-          var run_status = res.data.status;
-          var run_info = res.data.logs;
-          $scope.service["run_status"] = run_status;
-          $scope.service["run_info"] = run_info;
-          if(run_status=="success"){
-            $interval.cancel($scope.intervalId);
-          }
+            var run_status = res.data.status;
+            var run_info = res.data.logs;
+            for(var i=0;i<run_info.length;i++){
+                 run_info[i].log = Util.FormatLog(run_info[i].info);
+            }
+            $scope.service["run_status"] = run_status;
+            $scope.service["run_info"] = run_info;
+            if(run_status=="success"){
+                $interval.cancel($scope.intervalId);
+            }
         },function(e,err){
-          $interval.cancel($scope.intervalId);
-          $scope.service["run_status"] = "抱歉，网络原因无法得知当前状态";
-          $scope.service["run_info"] = "抱歉,网络原因无法更新日志";
+            $interval.cancel($scope.intervalId);
+            $scope.service["run_status"] = "抱歉，网络原因无法得知当前状态";
+            $scope.service["run_info"] = "抱歉,网络原因无法更新日志";
         });
     }
     
@@ -106,8 +109,7 @@ function ($scope,config,Util,Services,Service,ServiceInfo,ApplicationRun,Applica
             }
         }
     }
-    
-    
+
     $timeout(function () {
             Services.read({
                 "page_index":$scope.page_index,
@@ -123,7 +125,6 @@ function ($scope,config,Util,Services,Service,ServiceInfo,ApplicationRun,Applica
                 alert('请求失败');
             });
         }, 100);
-    
     $scope.submitForm = function(isValid) {
                 if (!isValid) {
                     alert('验证失败');

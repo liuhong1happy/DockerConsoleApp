@@ -11,6 +11,7 @@ angularApp.factory('Util', ["$window",function($window) {
           percent = parseInt(Log.progressDetail.current*100 / Log.progressDetail.total)+"%";
         }
         result = Log.status+" "+Log.id+" "+percent;
+          return result;
       }
       if(Log.status &&　Log.progressDetail && Log.progress){
         var percent = "100%";
@@ -18,6 +19,7 @@ angularApp.factory('Util', ["$window",function($window) {
           percent = parseInt(Log.progressDetail.current*100 / Log.progressDetail.total)+"%";
         }
         result = Log.status+" "+percent+" "+Log.progress;
+        return result;
       }
      if(Log.status){
          result = Log.status;

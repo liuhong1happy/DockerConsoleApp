@@ -32,18 +32,38 @@
                 </td>
                 <td>[[(app.update_time?app.update_time:app.create_time)*1000 | date:"yyyy-MM-dd hh:mm:ss"]]</td>
                 <td>
-                    <a class="btn btn-success" ng-click="container_access('restart','[[app._id]]')">重启</a>
-                    <a class="btn btn-success" ng-click="container_access('stop','[[app._id]]')">停止</a>
-                    <a class="btn btn-success" ng-click="container_access('delete','[[app._id]]')">删除</a>
                     <a class="btn btn-success" ng-click="show_run_logs('[[app._id]]')">构建日志</a>
                     <a class="btn btn-success" ng-click="show_container_logs('[[app._id]]')">运行日志</a>
                     <a class="btn btn-success" ng-click="show_exec('[[app._id]]')">交互操作</a>
+                    <br/>
+                    <a class="btn btn-success" ng-click="container_access('restart','[[app._id]]')">重启</a>
+                    <a class="btn btn-success" ng-click="container_access('stop','[[app._id]]')">停止</a>
+                    <a class="btn btn-success" ng-click="container_access('delete','[[app._id]]')">删除</a>
                 </td>
             </tr>
         </tbody>
     </table>
     </div>
-    <div  class="row" ng-show="showScope=='service'">
+    <div  class="row" ng-show="showScope=='application'">
+        <h2>[[application.project_name]]</h2>
+        <p>[[application.project_url]]</p>
+        <p>[[application.run_status]]</p>
+        
+        <a  class="btn btn-success" ng-click="showAppliactions()">返回</a>
+        <a  class="btn btn-success" ng-click="getContainerInfo(application._id)">刷新</a>
+        <hr />
+    </div>
+    <div class="row" ng-show="showScope=='application'">
+        <div class="run-info">
+            <ul>
+                <li ng-repeat="info in application.run_info">
+                    <p>[[info.log]]</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <div  class="row" ng-show="showScope=='logs'">
         <h2>[[service.project_name]]</h2>
         <p>[[service.project_url]]</p>
         <p>[[service.run_status]]</p>
@@ -51,7 +71,7 @@
         <a  class="btn btn-success" ng-click="getImageInfo()">刷新</a>
         <hr />
     </div>
-    <div class="row" ng-show="showScope=='service'">
+    <div class="row" ng-show="showScope=='logs'">
         <div class="run-info">
             <ul>
                 <li ng-repeat="info in project.run_info">
@@ -60,23 +80,7 @@
             </ul>
         </div>
     </div>
-    <div  class="row" ng-show="showScope=='application'">
-        <h2>[[application.project_name]]</h2>
-        <p>[[application.project_url]]</p>
-        <p>[[application.status]]</p>
-        <a  class="btn btn-success" ng-click="showServices()">返回</a>
-        <a  class="btn btn-success" ng-click="getImageInfo()">刷新</a>
-        <hr />
-    </div>
-    <div class="row" ng-show="showScope=='application'">
-        <div class="container-logs">
-            <ul>
-                <li ng-repeat="info in application.run_logs">
-                    <p>[[info.log]]</p>
-                </li>
-            </ul>
-        </div>
-    </div>
+    
     <div  class="row" ng-show="showScope=='exec'">
         <h2>[[application.project_name]]</h2>
         <p>[[application.project_url]]</p>

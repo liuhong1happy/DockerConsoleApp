@@ -29,7 +29,7 @@ class ApplicationRunHandler(AsyncBaseHandler):
         insertData["storage_path"] = storage_path
         insertData["user_id"] = user_id
         insertData["status"] = 'created'
-        insertData["logs"] = [{"create_time":create_time,"info":"started run application:"+project_name,"user_id":user_id}]
+        insertData["logs"] = [{"create_time":create_time,"info":{"stream":"started run application:"+project_name},"user_id":user_id}]
         result = yield self.s_application.insert_application(insertData)
         # 加入队列
         msg = Message( json.dumps({

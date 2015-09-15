@@ -265,15 +265,18 @@ class StartContainer():
         if application is None:
             return
         logs = application["logs"]
+        print logs
         if logs is None:
             logs = []
         if not isinstance(logs,list):
             logs = []
-        self._start_context["logs"] = []
+        self._start_context["logs"] = logs
         cli = options.docker_client
-        self._start_context["logs"].append({"info":"starting pull image:"+self._storage_path ,"user_id":self._user_id,"create_time":time.time()})
+        self._start_context["logs"].append({"info":{"stream":"starting pull image:"+self._storage_path} ,"user_id":self._user_id,"create_time":time.time()})
         for line in cli.pull(self._storage_path,stream=True,insecure_registry=True):
-            self._start_context["logs"].append({"info":line ,"user_id":self._user_id,"create_time":time.time()})
+            # 写入数据库
+            newLine = json.loads(line)
+            self._start_context["logs"].append({"info":newLine ,"user_id":self._user_id,"create_time":time.time()})
             self.update_database("success")
         
     def start_container(self):
@@ -289,7 +292,20 @@ class StartContainer():
         self._start_context["container_id"] = container["Id"]
         self._start_context["app_name"] = app_name
         self._start_context["run_host"] = settings.CURRENT_HOST 
+        self.update_application("start",app_name)
         self.update_database("success")
+
+    @gen.coroutine
+    def update_application(self,access,app_name):
+        cli = options.docker_client
+        response = cli.inspect_container(container=app_name)
+        application = {
+            "application_id":self._application_id,
+            "inspect_container":response,
+            "singleton":settings.SINGLETON,
+            "address_prefix": settings.DISCOVER_HOST if settings.SINGLETON else settins.DISCOVER_DOMAIN
+        }
+        application["update_result"] = yield self.s_application.insert_application(application)
         
     @gen.coroutine
     def update_database(self,status):
@@ -328,7 +344,17 @@ class AccessContainer():
         self.update_application("restart")
         self._access_context["response"] = response
         self.update_database("success")
-   
+    def logs_container(self):
+        cli = options.docker_client
+        response = []
+        for line in cli.logs(container=self._container_name,stream=True,tail='all'):
+            # 写入数据库
+            newLine = json.loads(line)
+            response.append({"info":newLine ,"user_id":self._user_id,"create_time":time.time()})
+        self.update_application("logs")
+        self._access_context["response"] = response
+        self.update_database("success")
+
     def stop_container(self):
         cli = options.docker_client
         response = cli.stop(container=self._container_name)
@@ -379,7 +405,6 @@ class AccessContainer():
     @gen.coroutine
     def update_database(self,status):
         self._access_context["status"] = status
-        
         result = {}
         if(self._access_type == "delete"):
             application = yield self.s_application.find_one(self._application_id)
