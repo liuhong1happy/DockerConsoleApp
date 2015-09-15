@@ -12,6 +12,8 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess) {
     $scope.page_index = 0;
     $scope.page_size = 20;
     $scope.applications = [];
+    $scope.showList  = ["list","service","application","exec"]
+    $scope.showScope = $scope.showList[0];
     $timeout(function () {
             Applications.read({
                 "page_index":$scope.page_index,
@@ -71,5 +73,31 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess) {
       },function(e,err){
         alert('请求失败');
       })
+    }
+    
+    $scope.show_run_logs = function(_id){
+      // 获取日志
+      
+      // 切换视图
+      $scope.showScope = $scope.showList[1];
+    }
+    $scope.show_container_logs = function(_id){
+      // 获取日志
+      
+      // 切换视图
+      $scope.showScope = $scope.showList[2];
+    }
+    $scope.show_exec = function(_id){
+      // 查找application
+      var findArr = $scope.applications.filter(function(item,index){
+        return item._id==_id;
+      });
+      if(findArr.length>=1){
+        $scope.application = findArr[0];
+        // 切换视图
+        $scope.showScope = $scope.showList[2];
+      }else{
+        $window.console.log("没有找到容器");
+      }
     }
 }]);
