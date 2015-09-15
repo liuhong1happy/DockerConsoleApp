@@ -97,7 +97,6 @@ def create_service(msg):
     msg.ack()
 
 def run_application(msg):
-def run_application(msg):
     start_context = json.loads(msg.body)
     builder = StartContainer(start_context)
     builder.start_run_application()
