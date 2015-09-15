@@ -3,9 +3,9 @@
     <p>这里可以查看到你开启的应用</p>
     <hr />
 </div>
-<div class="details-body">
-    <div class="row">
-    <table class="table">
+<div class="details-body" >
+    <div class="row" ng-show="showScope=='list'">
+        <table class="table" >
         <thead>
             <tr>
                 <th>应用名称</th>
@@ -35,11 +35,63 @@
                     <a class="btn btn-success" ng-click="container_access('restart','[[app._id]]')">重启</a>
                     <a class="btn btn-success" ng-click="container_access('stop','[[app._id]]')">停止</a>
                     <a class="btn btn-success" ng-click="container_access('delete','[[app._id]]')">删除</a>
-                    <a class="btn btn-success" ng-click="show_logs('[[app._id]]')">查看日志</a>
+                    <a class="btn btn-success" ng-click="show_run_logs('[[app._id]]')">构建日志</a>
+                    <a class="btn btn-success" ng-click="show_container_logs('[[app._id]]')">运行日志</a>
                     <a class="btn btn-success" ng-click="show_exec('[[app._id]]')">交互操作</a>
                 </td>
             </tr>
         </tbody>
     </table>
-</div>
+    </div>
+    <div  class="row" ng-show="showScope=='service'">
+        <h2>[[service.project_name]]</h2>
+        <p>[[service.project_url]]</p>
+        <p>[[service.run_status]]</p>
+        <a  class="btn btn-success" ng-click="showServices()">返回</a>
+        <a  class="btn btn-success" ng-click="getImageInfo()">刷新</a>
+        <hr />
+    </div>
+    <div class="row" ng-show="showScope=='service'">
+        <div class="run-info">
+            <ul>
+                <li ng-repeat="info in project.run_info">
+                    <p>[[info.log]]</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div  class="row" ng-show="showScope=='application'">
+        <h2>[[application.project_name]]</h2>
+        <p>[[application.project_url]]</p>
+        <p>[[application.status]]</p>
+        <a  class="btn btn-success" ng-click="showServices()">返回</a>
+        <a  class="btn btn-success" ng-click="getImageInfo()">刷新</a>
+        <hr />
+    </div>
+    <div class="row" ng-show="showScope=='application'">
+        <div class="container-logs">
+            <ul>
+                <li ng-repeat="info in application.run_logs">
+                    <p>[[info.log]]</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div  class="row" ng-show="showScope=='exec'">
+        <h2>[[application.project_name]]</h2>
+        <p>[[application.project_url]]</p>
+        <p>[[application.status]]</p>
+        <a  class="btn btn-success" ng-click="showServices()">返回</a>
+        <a  class="btn btn-success" ng-click="getImageInfo()">刷新</a>
+        <hr />
+    </div>
+    <div class="row" ng-show="showScope=='exec'">
+        <div class="container-logs">
+            <ul>
+                <li ng-repeat="info in application.run_logs">
+                    <p>[[info.log]]</p>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>
