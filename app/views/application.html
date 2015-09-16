@@ -64,17 +64,16 @@
     </div>
     
     <div  class="row" ng-show="showScope=='logs'">
-        <h2>[[service.project_name]]</h2>
-        <p>[[service.project_url]]</p>
-        <p>[[service.run_status]]</p>
-        <a  class="btn btn-success" ng-click="showServices()">返回</a>
-        <a  class="btn btn-success" ng-click="getImageInfo()">刷新</a>
+        <h2>[[container.app_name]]</h2>
+        <p>[[container.address]]</p>
+        <p>[[container.status]]</p>
+        <a  class="btn btn-success" ng-click="showAppliactions()">返回</a>
         <hr />
     </div>
     <div class="row" ng-show="showScope=='logs'">
         <div class="run-info">
             <ul>
-                <li ng-repeat="info in project.run_info">
+                <li ng-repeat="info in container.logs">
                     <p>[[info.log]]</p>
                 </li>
             </ul>
@@ -82,17 +81,16 @@
     </div>
     
     <div  class="row" ng-show="showScope=='exec'">
-        <h2>[[application.project_name]]</h2>
-        <p>[[application.project_url]]</p>
-        <p>[[application.status]]</p>
-        <a  class="btn btn-success" ng-click="showServices()">返回</a>
-        <a  class="btn btn-success" ng-click="getImageInfo()">刷新</a>
+        <h2>[[exec.app_name]]</h2>
+        <p>[[exec.address]]</p>
+        <p>[[exec.status]]</p>
+        <a  class="btn btn-success" ng-click="showAppliactions()">返回</a>
         <hr />
     </div>
     <div class="row" ng-show="showScope=='exec'">
-        <div class="container-logs">
+        <div class="exec-logs">
             <ul>
-                <li ng-repeat="info in application.run_logs">
+                <li ng-repeat="info in exec.logs">
                     <p>[[info.log]]</p>
                 </li>
             </ul>
