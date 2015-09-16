@@ -105,12 +105,36 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess,Applicat
             }
         }
     }
+    
+    $scope.getContainerLogs = function(_id){
+        if($scope.container==null) $interval.cancel($scope.intervalId);
+        
+        ApplicationLogs.info(null,$.param({
+          "application_id":_id
+        }),function(res){
+            var logs_status = res.data.status;
+            var logs_info = res.data.logs;
+            for(var i=0;i<logs_info.length;i++){
+                 logs_info[i].log = Util.FormatLog(logs_info[i].info);
+            }
+            $scope.container["status"] = run_status;
+            $scope.container["logs"] = logs_info;
+            if(run_status=="success"){
+                $interval.cancel($scope.intervalId);
+            }
+        },function(e,err){
+            $interval.cancel($scope.intervalId);
+            $scope.container["status"] = "抱歉，网络原因无法得知当前状态";
+            $scope.container["logs"] = "抱歉,网络原因无法更新日志";
+        });
+    }
+    
     // 获取容器日志
     $scope.show_container_logs = function(_id){
       // 获取日志
-      
+      $scope.intervalId = $interval(getContainerLogs,3000,_id);
       // 切换视图
-      $scope.showScope = $scope.showList[2];
+      $scope.showScope = $scope.showList[1];
     }
     // 追加交互日志
     $scope.append_exec_logs = function(content){
