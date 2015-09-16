@@ -68,6 +68,8 @@ class BaseModel():
             else:
                 fields = {"_id":True,"del_flag":False}
         result = self.db_conn.find_one(filter = spec_or_id,projection = fields)
+        if result is not None:
+            result["_id"] = str(result["_id"])
         callback(result)
     
     @return_future

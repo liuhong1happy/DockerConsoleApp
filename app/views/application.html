@@ -72,11 +72,14 @@
     </div>
     <div class="row" ng-show="showScope=='logs'">
         <div class="run-info">
-            <ul>
+            <ul ng-if="container.logs.length>0">
                 <li ng-repeat="info in container.logs">
                     <p>[[info.log]]</p>
                 </li>
             </ul>
+            <div ng-if="container.logs.length==0" style="font-size:18px;">
+                正在努力加载...
+            </div>
         </div>
     </div>
     

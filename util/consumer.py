@@ -337,6 +337,8 @@ class AccessContainer():
             self.exec_container()
         if(self._access_type=="update"):
             self.update_container()
+        if(self._access_type=="logs"):
+            self.logs_container()
     
     def restart_container(self):
         cli = options.docker_client
@@ -349,10 +351,9 @@ class AccessContainer():
         response = []
         for line in cli.logs(container=self._container_name,stream=True,tail='all'):
             # 写入数据库
-            newLine = json.loads(line)
-            response.append({"info":newLine ,"user_id":self._user_id,"create_time":time.time()})
+            response.append({"info":{"stream":line} ,"user_id":self._user_id,"create_time":time.time()})
         self.update_application("logs")
-        self._access_context["response"] = response
+        self._access_context["logs"] = response
         self.update_database("success")
 
     def stop_container(self):

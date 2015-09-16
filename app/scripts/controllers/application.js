@@ -7,8 +7,8 @@
  * # AboutCtrl
  * Controller of the angularApp
  */
-angularApp.controller('AppCtrl', ["$scope","config","$window","$timeout","Applications","ApplicationAccess","ApplicationInfo","Util",
-function ($scope,config,$window,$timeout,Applications,ApplicationAccess,ApplicationInfo,Util) {
+angularApp.controller('AppCtrl', ["$scope","config","$window","$timeout","Applications","ApplicationAccess","ApplicationInfo","Util","$interval",
+function ($scope,config,$window,$timeout,Applications,ApplicationAccess,ApplicationInfo,Util,$interval) {
     $scope.page_index = 0;
     $scope.page_size = 20;
     $scope.applications = [];
@@ -96,7 +96,7 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess,Applicat
     }
     // 获取构建日志
     $scope.show_run_logs = function(_id){
-      // 获取日志
+        // 获取日志
         for(var i=0;i<$scope.applications.length;i++){
             if($scope.applications[i]._id == _id){
                   $scope.application = $scope.applications[i];
@@ -106,20 +106,22 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess,Applicat
         }
     }
     
-    $scope.getContainerLogs = function(_id){
-        if($scope.container==null) $interval.cancel($scope.intervalId);
-        
-        ApplicationLogs.info(null,$.param({
-          "application_id":_id
-        }),function(res){
-            var logs_status = res.data.status;
-            var logs_info = res.data.logs;
-            for(var i=0;i<logs_info.length;i++){
-                 logs_info[i].log = Util.FormatLog(logs_info[i].info);
+    $scope.getContainerLogs = function(){
+        if($scope.container==null || $scope.container.status=="success") {
+            $interval.cancel($scope.intervalId);
+            return;
+        }
+        ApplicationAccess.find({
+          "access_id":$scope.access_id
+        },function(res){
+            var status = res.data.status;
+            var logs = res.data.logs;
+            for(var i=0;i<logs.length;i++){
+                 logs[i].log = Util.FormatLog(logs[i].info);
             }
-            $scope.container["status"] = run_status;
-            $scope.container["logs"] = logs_info;
-            if(run_status=="success"){
+            $scope.container["status"] = status;
+            $scope.container["logs"] = logs;
+            if(status=="success"){
                 $interval.cancel($scope.intervalId);
             }
         },function(e,err){
@@ -131,8 +133,35 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess,Applicat
     
     // 获取容器日志
     $scope.show_container_logs = function(_id){
-      // 获取日志
-      $scope.intervalId = $interval(getContainerLogs,3000,_id);
+       $scope.container = {
+            app_name:"",
+            address:"",
+            status:"start",
+            logs:[]
+       };
+        // 获取日志
+        for(var i=0;i<$scope.applications.length;i++){
+            if($scope.applications[i]._id == _id){
+                  var application = $scope.applications[i];
+                  $scope.container["app_name"] =application["project_name"];
+                  $scope.container["address"] =application["project_url"];
+            }
+        }
+      ApplicationAccess.start(null,$.param({
+          "type":"logs",
+          "id":_id,
+          "content":""
+      }),function(res){
+              if(res.status=="success"){
+                     // 获取日志
+                    $scope.access_id = res.data._id;
+                    $scope.intervalId = $interval($scope.getContainerLogs,3000);
+                }else{
+                    alert(res.msg);
+                }
+      },function(e,err){
+        alert('请求失败');
+      });
       // 切换视图
       $scope.showScope = $scope.showList[1];
     }

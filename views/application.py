@@ -99,8 +99,8 @@ class ApplicationAccessHandler(AsyncBaseHandler):
     
     @gen.coroutine
     def _get_(self):
-        access_id = self.get_argument("id",None)
-        access_info =  yield   s_application_access.find_one(access_id)
+        access_id = self.get_argument("access_id",None)
+        access_info =  yield   self.s_application_access.find_one(access_id)
         if access_info is None:
             self.render_error(error_code=404,msg="not data")
         else:

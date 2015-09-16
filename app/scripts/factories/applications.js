@@ -35,12 +35,3 @@ angularApp.factory('ApplicationAccess',["$resource",function($resource){
         }
     });
 }]);
-
-angularApp.factory('ContainerLogs',["$resource",function($resource){
-    return $resource('/api/container/logs',null,{
-        "logs":{
-            method:"post",
-            isArray:false
-        }
-    });
-}]);
