@@ -155,6 +155,7 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess,Applicat
               if(res.status=="success"){
                      // 获取日志
                     $scope.access_id = res.data._id;
+                    if($scope.intervalId) $interval.cancel($scope.intervalId);
                     $scope.intervalId = $interval($scope.getContainerLogs,3000);
                 }else{
                     alert(res.msg);
@@ -165,16 +166,32 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess,Applicat
       // 切换视图
       $scope.showScope = $scope.showList[1];
     }
+    
     // 追加交互日志
-    $scope.append_exec_logs = function(content){
-      if(content==""){
-        $scope.exec_logs.push("");
-      }else{
-        // 和后台进行交互获取日志
-        
-        // 将结果呈现在界面上
-        $scope.exec_logs.push(content);
-      }
+    $scope.append_exec_logs = function(){
+        if($scope.exec==null || $scope.exec.status=="success") {
+            $interval.cancel($scope.intervalId);
+            return;
+        }
+        ApplicationAccess.find({
+          "access_id":$scope.access_id
+        },function(res){
+            var status = res.data.status;
+            var logs = res.data.logs;
+            for(var i=0;i<logs.length;i++){
+                 logs[i].log = Util.FormatLog(logs[i].info);
+            }
+            
+            $scope.exec["status"] = status;
+            $scope.exec.logs = $scope.exec.logs.concat(logs);
+            if(status=="success"){
+                $interval.cancel($scope.intervalId);
+            }
+        },function(e,err){
+            $interval.cancel($scope.intervalId);
+            $scope.container["status"] = "抱歉，网络原因无法得知当前状态";
+            $scope.container["logs"] = "抱歉,网络原因无法更新日志";
+        });
     }
     $scope.show_exec = function(_id){
       // 查找application
@@ -182,13 +199,47 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess,Applicat
         return item._id==_id;
       });
       if(findArr.length>=1){
-        $scope.application = findArr[0];
-        // 清空交互日志
-        $scope.exec_logs = [];
-        // 切换视图
-        $scope.showScope = $scope.showList[2];
+          $scope.application = findArr[0];
+          // 清空交互日志
+          $scope.exec = {
+            status: "success",
+            logs: []
+          }
+          // 切换视图
+          $scope.showScope = $scope.showList[3];
       }else{
-        $window.console.log("没有找到容器");
+          $window.console.log("没有找到容器");
       }
+    }
+    $scope.inputExecCMD = function(e){
+        var currKey = e.keyCode||e.which||e.charCode;
+        // 键入回车
+        if(currKey==13){
+            var value = $scope.exec.input_value;
+            if(value=="clear"){
+                $scope.exec = { status: "success", logs: [] };
+            }
+            if(value==""){
+              $scope.exec.logs.push("");
+              return;
+            }
+            $scope.exec.status = "start";
+            ApplicationAccess.start(null,$.param({
+                "type":"exec",
+                "id":_id,
+                "content":value
+            }),function(res){
+                    if(res.status=="success"){
+                           // 获取日志
+                          $scope.access_id = res.data._id;
+                          if($scope.intervalId) $interval.cancel($scope.intervalId);
+                          $scope.intervalId = $interval($scope.append_exec_logs,3000);
+                      }else{
+                          alert(res.msg);
+                      }
+            },function(e,err){
+              alert('请求失败');
+            });
+        }
     }
 }]);
