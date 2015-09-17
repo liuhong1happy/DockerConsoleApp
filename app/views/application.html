@@ -101,7 +101,7 @@
                 正在请求，请耐心等待回应...
             </div>
             <div>
-              <input type="text" ng-if="exec.status=='start'" class="console-input" ng-click="inputExecCMD(e)" />
+              <input ng-model="exec.input_value" type="text" ng-if="exec.status=='start'" class="console-input" ng-keyup="inputExecCMD(e)" />
             </div>
         </div>
     </div>
