@@ -97,8 +97,11 @@
                     <p>[[info.log]]</p>
                 </li>
             </ul>
+            <div ng-if="exec.status=='start'" style="font-size:18px;">
+                正在请求，请耐心等待回应...
+            </div>
             <div>
-              <input type="text" class="console-input" ng-click="inputExecCMD(e)" />
+              <input type="text" ng-if="exec.status=='start'" class="console-input" ng-click="inputExecCMD(e)" />
             </div>
         </div>
     </div>
