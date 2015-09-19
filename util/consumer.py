@@ -14,6 +14,7 @@ from services.oauth import OAuthService
 from services.service import ServiceService
 from services.application import ApplicationService
 from services.application_access import ApplicationAccessService
+from services.registry import RegistryService
 from tornado.httputil import HTTPHeaders
 from tornado import gen
 import md5
@@ -108,6 +109,7 @@ def access_application(msg):
     builder.start_access_application()
     msg.ack()
 
+    
 class BuildImage():
     s_service = ServiceService()
     def __init__(self,build_context):
@@ -242,14 +244,11 @@ class BuildImage():
 
 class StartContainer():
     s_application = ApplicationService()
-    
-    
     def __init__(self,start_context):
         self._start_context = start_context
         self._application_id = self._start_context["application_id"]
         self._storage_path = self._start_context["storage_path"]
         self._user_id = self._start_context["user_id"]
-        self._project_url = self._start_context["project_url"]
         self._project_name = self._start_context["project_name"]
         self._user_name =  self._start_context["user_name"]
         self._app_prefix = self._user_name+"-"+self._project_name+"-"
@@ -265,7 +264,6 @@ class StartContainer():
         if application is None:
             return
         logs = application["logs"]
-        print logs
         if logs is None:
             logs = []
         if not isinstance(logs,list):
@@ -277,7 +275,7 @@ class StartContainer():
             # 写入数据库
             newLine = json.loads(line)
             self._start_context["logs"].append({"info":newLine ,"user_id":self._user_id,"create_time":time.time()})
-            self.update_database("success")
+            self.update_database("running")
         
     def start_container(self):
         host_config = create_host_config(publish_all_ports=True,restart_policy={'Name':'always'})
@@ -413,3 +411,28 @@ class AccessContainer():
             application["del_flag"] = True
             delObj = yield self.s_application.insert_application(application)
         result = yield self.s_application_access.access_application(self._access_context)
+
+class StartRegistry():
+    s_registry = RegistryService()
+    def __init__(self,registry_context):
+        self._context = registry_context
+        self._registry_id = self._context["registry_id"]
+        self._user_name = self._context["user_name"]
+        self._app_name = self._user_name+"-registry"
+    def pull_image(self):
+        for line in cli.pull("registry",stream=True,insecure_registry=True):
+            # 写入数据库
+            newLine = json.loads(line)
+            self._context["logs"].append({"info":newLine ,"user_id":self._user_id,"create_time":time.time()})
+            self.update_database("running")
+    def start_container(self):
+        container = cli.create_container(image=self._storage_path,host_config=host_config,name=app_name)
+        response = cli.start(container=app_name)
+        inspect = cli.inspect_container(container=self._container_name)
+        self._context["inspect_container"] = inspect
+        self.update_database("success")
+    
+    @gen.coroutine
+    def update_database(self,status):
+        self._context["status"] = status
+        result = yield self.s_registry.insert_registry(self._context)
