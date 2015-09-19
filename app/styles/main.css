@@ -202,7 +202,7 @@ a:focus,a:hover{
     }
   }
 
-.build-info,.run-info{
+.build-info,.run-info,.exec-logs{
         background: #000;
         max-height: 500px;
         overflow-y: scroll;
@@ -210,7 +210,16 @@ a:focus,a:hover{
         box-shadow: 0px 0px 1px #333;
 }
 
-.build-info ul,.run-info ul{
+.build-info ul,.run-info ul,.exec-logs ul{
         list-style: none;
         padding-left: 0px;
 }
+.exec-logs input{
+      width: 100%;
+      background-color: #000;
+      padding: 0px;
+      border: 0px;
+}
+.exec-logs input:focus {
+    outline: none;
+} 

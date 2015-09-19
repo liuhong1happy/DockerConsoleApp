@@ -77,9 +77,9 @@ angularApp.factory("config",function(){
         envirement:"dev",
         dev:{
             hrefs:{
-                book:"http://www.dockerconsole.com:4000",
-                code:"http://www.dockerconsole.com:10080",
-                test:"http://www.dockerconsole.com:10081",
+                book:"http://192.168.1.6:4000",
+                code:"http://192.168.1.6:10080",
+                test:"http://192.168.1.6:10081",
             },
             gitlab:{
                 token:"http://www.dockerconsole.com:10080/oauth/authorize",

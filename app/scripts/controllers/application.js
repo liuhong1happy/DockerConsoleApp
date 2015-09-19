@@ -122,7 +122,7 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess,Applicat
             $scope.container["status"] = status;
             $scope.container["logs"] = logs;
             if(status=="success"){
-                $interval.cancel($scope.intervalId);
+               $interval.cancel($scope.intervalId);
             }
         },function(e,err){
             $interval.cancel($scope.intervalId);
@@ -139,8 +139,8 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess,Applicat
             status:"start",
             logs:[]
        };
-        // 获取日志
-        for(var i=0;i<$scope.applications.length;i++){
+       // 获取日志
+      for(var i=0;i<$scope.applications.length;i++){
             if($scope.applications[i]._id == _id){
                   var application = $scope.applications[i];
                   $scope.container["app_name"] =application["project_name"];
@@ -178,14 +178,15 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess,Applicat
         },function(res){
             var status = res.data.status;
             var logs = res.data.logs;
-            for(var i=0;i<logs.length;i++){
-                 logs[i].log = Util.FormatLog(logs[i].info);
-            }
-            
+            logs = logs.replace(/\n/gm,"<br/>");
             $scope.exec["status"] = status;
-            $scope.exec.logs = $scope.exec.logs.concat(logs);
+            $scope.exec.logs = $scope.exec.logs.concat([logs]);
             if(status=="success"){
                 $interval.cancel($scope.intervalId);
+                $scope.$input.focus();
+                  $timeout(function(){
+                      $scope.$exec.scrollTop($scope.$exec.find("ul").height());
+                  },100);
             }
         },function(e,err){
             $interval.cancel($scope.intervalId);
@@ -198,6 +199,9 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess,Applicat
       var findArr = $scope.applications.filter(function(item,index){
         return item._id==_id;
       });
+       $scope.$input = angular.element(".console-input");
+       $scope.$exec = angular.element(".exec-logs");
+       $scope.$input.focus();
       if(findArr.length>=1){
           $scope.application = findArr[0];
           // 清空交互日志
@@ -212,26 +216,33 @@ function ($scope,config,$window,$timeout,Applications,ApplicationAccess,Applicat
       }
     }
     $scope.inputExecCMD = function(e){
+        e = e || event;
         var currKey = e.keyCode||e.which||e.charCode;
         // 键入回车
         if(currKey==13){
             var value = $scope.exec.input_value;
             if(value=="clear"){
                 $scope.exec = { status: "success", logs: [] };
+                return;
             }
             if(value==""){
               $scope.exec.logs.push("");
               return;
             }
             $scope.exec.status = "start";
+            $scope.exec.logs.push(value);
+            $scope.$input.val("");
             ApplicationAccess.start(null,$.param({
                 "type":"exec",
-                "id":_id,
+                "id":$scope.application._id,
                 "content":value
             }),function(res){
                     if(res.status=="success"){
                            // 获取日志
                           $scope.access_id = res.data._id;
+                          $timeout(function(){
+                              $scope.$exec.scrollTop($scope.$exec.find("ul").height());
+                          },100);
                           if($scope.intervalId) $interval.cancel($scope.intervalId);
                           $scope.intervalId = $interval($scope.append_exec_logs,3000);
                       }else{

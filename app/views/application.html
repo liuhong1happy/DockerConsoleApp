@@ -93,15 +93,15 @@
     <div class="row" ng-show="showScope=='exec'">
         <div class="exec-logs">
             <ul>
-                <li ng-repeat="info in exec.logs">
-                    <p>[[info.log]]</p>
+                <li ng-repeat="info in exec.logs track by $index">
+                    <p ng-bind-html="info"></p>
                 </li>
             </ul>
-            <div ng-if="exec.status=='start'" style="font-size:18px;">
+            <div ng-if="exec.status=='start'" style="font-size:12px;">
                 正在请求，请耐心等待回应...
             </div>
             <div>
-              <input ng-model="exec.input_value" type="text" ng-if="exec.status=='start'" class="console-input" ng-keyup="inputExecCMD(e)" />
+              <input ng-model="exec.input_value" type="text" class="console-input" ng-keyup="inputExecCMD(e)" />
             </div>
         </div>
     </div>

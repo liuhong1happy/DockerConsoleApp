@@ -375,10 +375,10 @@ class AccessContainer():
     
     def exec_container(self):
         cli = options.docker_client
-        exec_obj = cli.exec_create(container=self._container_name,cmd=self._access_content.slipt(' '))
+        exec_obj = cli.exec_create(container=self._container_name,cmd=str(self._access_content).split(' '))
         response = cli.exec_start(exec_id=exec_obj["Id"])
         self.update_application("exec:"+self._access_content)
-        self._access_context["response"] = response
+        self._access_context["logs"] = response
         self.update_database("success")
         
     def update_container(self):
