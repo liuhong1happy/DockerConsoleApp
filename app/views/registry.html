@@ -1,0 +1,28 @@
+<div class="row details-header" >
+    <h2>加速器</h2>
+    <p>我们会为你启动我们单独为你开辟的私人加速器，来加快你的镜像下载</p>
+    <hr />
+</div>
+<div class="details-body" ng-show="showScope=='Inited'">
+    <div class="row">
+        <a class="btn btn-success" ng-if="registry.status=='nostart' || registry.status=='start'" ng-click="startRegistry()">开启加速器</a>
+        <span ng-if="registry.status=='start'">正在开启...</span>
+        <span ng-if="registry.status=='success'">
+            开启成功
+        </span>
+    </div>
+    <div class="row" ng-if="registry.status=='success'">
+        <p>
+            你的专属加速器地址<span>[[registry.address]]</span>
+        </p>
+        <h4  >
+            使用方法：
+        </h4>
+        <p>
+        编辑/etc/default/docker，加入如下一句话
+        </p>
+        <p>
+            DOCKER_OPTS="$DOCKER_OPTS --registry-mirror=http://[[registry.address]]"
+        </p>
+    </div>
+</div>

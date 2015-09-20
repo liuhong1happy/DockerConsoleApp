@@ -59,8 +59,13 @@ var angularApp = angular
       })
       .when('/application', {
         templateUrl: 'views/application.html',
-        controller: 'AppCtrl',
+        controller: 'AppcationCtrl',
         controllerAs: 'application'
+      })
+      .when('/registry', {
+        templateUrl: 'views/registry.html',
+        controller: 'RegistryCtrl',
+        controllerAs: 'registry'
       })
       .when('/about', {
         templateUrl: 'views/about.html',

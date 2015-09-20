@@ -7,7 +7,7 @@
  * # AboutCtrl
  * Controller of the angularApp
  */
-angularApp.controller('AppCtrl', ["$scope","config","$window","$timeout","Applications","ApplicationAccess","ApplicationInfo","Util","$interval",
+angularApp.controller('AppcationCtrl', ["$scope","config","$window","$timeout","Applications","ApplicationAccess","ApplicationInfo","Util","$interval",
 function ($scope,config,$window,$timeout,Applications,ApplicationAccess,ApplicationInfo,Util,$interval) {
     $scope.page_index = 0;
     $scope.page_size = 20;

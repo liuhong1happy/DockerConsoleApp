@@ -36,6 +36,13 @@ def init_queue():
     ch.queue_bind(queue=settings.RUN_APPLICATION_QUEUE,
                   exchange=settings.RUN_APPLICATION_EXCHANGE,
                   routing_key=settings.RUN_APPLICATION_ROUTING)
+    
+    ch.exchange_declare(exchange= settings.RUN_REGISTRY_EXCHANGE , type='direct',durable=True)
+    ch.queue_declare(queue=settings.RUN_REGISTRY_QUEUE,durable=True)
+    ch.queue_bind(queue=settings.RUN_REGISTRY_QUEUE,
+                  exchange=settings.RUN_REGISTRY_EXCHANGE,
+                  routing_key=settings.RUN_REGISTRY_ROUTING)
+    
     ch.exchange_declare(exchange= settings.ACCESS_APPLICATION_EXCHANGE , type='topic',durable=True)
     ch.queue_declare(queue=settings.ACCESS_APPLICATION_QUEUE,durable=True)
     ch.queue_bind(queue=settings.ACCESS_APPLICATION_QUEUE,

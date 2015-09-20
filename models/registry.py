@@ -10,6 +10,7 @@ class RegistryModel(BaseModel):
         "user_name":True,
         "user_id":True,
         "inspect_container":True,
+        "run_host":True,
         "status":True,
         "logs":True,
         "update_time":True,

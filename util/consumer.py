@@ -60,6 +60,13 @@ def init_queue():
     ch.queue_bind(queue=settings.RUN_APPLICATION_QUEUE,
                   exchange=settings.RUN_APPLICATION_EXCHANGE,
                   routing_key=settings.RUN_APPLICATION_ROUTING)
+    
+    ch.exchange_declare(exchange= settings.RUN_REGISTRY_EXCHANGE , type='direct',durable=True)
+    ch.queue_declare(queue=settings.RUN_REGISTRY_QUEUE,durable=True)
+    ch.queue_bind(queue=settings.RUN_REGISTRY_QUEUE,
+                  exchange=settings.RUN_REGISTRY_EXCHANGE,
+                  routing_key=settings.RUN_REGISTRY_ROUTING)
+    
 
     ch.exchange_declare(exchange= settings.ACCESS_APPLICATION_EXCHANGE , type='topic',durable=True)
     ch.queue_declare(queue=settings.ACCESS_APPLICATION_QUEUE,durable=True)
@@ -73,6 +80,7 @@ def init_consumer():
     ch = conn.channel()
     ch.consume(settings.CREATE_SERVICE_QUEUE,create_service,no_ack=False)
     ch.consume(settings.RUN_APPLICATION_QUEUE,run_application,no_ack=False)
+    ch.consume(settings.RUN_REGISTRY_QUEUE,run_registry,no_ack=False)
     ch.consume(settings.ACCESS_APPLICATION_QUEUE,access_application,no_ack=False)
     logging.info("Init amqp consumer success")
 
@@ -101,6 +109,11 @@ def run_application(msg):
     start_context = json.loads(msg.body)
     builder = StartContainer(start_context)
     builder.start_run_application()
+    msg.ack()
+def run_registry(msg):
+    registry_context = json.loads(msg.body)
+    builder = StartRegistry(registry_context)
+    builder.start_run_registry()
     msg.ack()
 
 def access_application(msg):
@@ -416,20 +429,45 @@ class StartRegistry():
     s_registry = RegistryService()
     def __init__(self,registry_context):
         self._context = registry_context
-        self._registry_id = self._context["registry_id"]
+        print self._context
+        self._registry_id = self._context.get("registry_id",None)
+        print self._registry_id
+        if(self._registry_id is None):
+            return
+        self._user_id = self._context["user_id"]
         self._user_name = self._context["user_name"]
         self._app_name = self._user_name+"-registry"
+        self._context["logs"] = []
+    
+    def start_run_registry(self):
+        if(self._registry_id is None):
+            return
+        self.pull_image()
+        self.start_container()
+    
     def pull_image(self):
-        for line in cli.pull("registry",stream=True,insecure_registry=True):
+        cli = options.docker_client
+        for line in cli.pull("registry:latest",stream=True,insecure_registry=True):
+            print line
             # 写入数据库
             newLine = json.loads(line)
             self._context["logs"].append({"info":newLine ,"user_id":self._user_id,"create_time":time.time()})
-            self.update_database("running")
+            self.update_database("start")
+        print "pull end"
     def start_container(self):
-        container = cli.create_container(image=self._storage_path,host_config=host_config,name=app_name)
-        response = cli.start(container=app_name)
-        inspect = cli.inspect_container(container=self._container_name)
+        cli = options.docker_client
+        host_config = create_host_config(publish_all_ports=True,restart_policy={'Name':'always'})
+        try:
+            container = cli.create_container(image="registry:latest",host_config=host_config,name=self._app_name)
+        except Exception as e:
+            pass
+        response = cli.start(container=self._app_name)
+        inspect = cli.inspect_container(container=self._app_name)
+        self._context["app_name"] = self._app_name
+        self._context["run_host"] = settings.CURRENT_HOST
         self._context["inspect_container"] = inspect
+        self._context["singleton"]= settings.SINGLETON
+        self._context["address_prefix"] =  settings.DISCOVER_HOST if settings.SINGLETON else settins.DISCOVER_DOMAIN
         self.update_database("success")
     
     @gen.coroutine
